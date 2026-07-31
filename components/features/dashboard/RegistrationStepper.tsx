@@ -54,9 +54,9 @@ export default function RegistrationStepper() {
             <div
               className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center shadow-sm ${
                 step.status === "completed"
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#2F2FE4] text-white"
                   : step.status === "active"
-                    ? "bg-white border-2 border-blue-600 text-blue-600"
+                    ? "bg-white border-2 border-[#2F2FE4] text-[#2F2FE4]"
                     : "bg-slate-50 border border-slate-100 text-slate-300 shadow-none"
               }`}
             >
@@ -70,7 +70,7 @@ export default function RegistrationStepper() {
                 step.status === "completed"
                   ? "text-slate-900"
                   : step.status === "active"
-                    ? "text-blue-600"
+                    ? "text-[#2F2FE4]"
                     : "text-slate-400"
               }`}
             >

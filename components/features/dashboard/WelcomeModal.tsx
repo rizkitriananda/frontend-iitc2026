@@ -53,7 +53,7 @@ export default function WelcomeModal() {
             <div className="flex flex-col w-full gap-3 pt-4">
               <Button
                 onClick={handleOpenProfile}
-                className="w-full bg-[#1a0b8c] hover:bg-[#13076b] text-white rounded-xl h-12 flex items-center justify-center gap-2 shadow-sm transition-all"
+                className="w-full bg-[#1000C7] hover:bg-[#13076b] text-white rounded-xl h-12 flex items-center justify-center gap-2  transition-all"
               >
                 Lengkapi Profil <ArrowRight className="w-4 h-4" />
               </Button>

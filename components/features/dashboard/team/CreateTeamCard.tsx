@@ -1,42 +1,45 @@
 "use client";
 
-import { UserPlus, ArrowRight } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface CreateTeamCardProps {
-  onClick?: () => void;
+  onClick: () => void;
+  disabled?: boolean;
 }
 
-export default function CreateTeamCard({ onClick }: CreateTeamCardProps) {
+export default function CreateTeamCard({
+  onClick,
+  disabled = false,
+}: CreateTeamCardProps) {
   return (
-    <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow rounded-2xl overflow-hidden h-full">
-      <CardContent className="p-8 flex flex-col h-full">
-        {/* Icon Container */}
-        <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mb-6">
-          <UserPlus className="w-6 h-6 text-[#1a0b8c]" />
-        </div>
+    <div className="bg-white border border-slate-200 rounded-2xl p-8 flex flex-col shadow-sm h-full">
+      <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mb-6">
+        <UserPlus className="w-6 h-6 text-[#2F2FE4]" />
+      </div>
+      <h3 className="text-xl font-bold text-slate-900 mb-2">Buat Tim Baru</h3>
+      <p className="text-sm text-slate-500 leading-relaxed mb-6 flex-1">
+        Jadilah ketua tim. Anda akan membuat ruang kerja khusus untuk
+        mendaftarkan anggota, memilih kategori kompetisi, dan mengelola
+        pengumpulan karya.
+      </p>
 
-        {/* Text Content */}
-        <div className="flex-1 space-y-3 mb-8">
-          <h2 className="text-xl font-bold text-slate-900">Buat Tim Baru</h2>
-          <p className="text-sm text-slate-500 leading-relaxed">
-            Jadilah ketua tim. Anda akan membuat ruang kerja khusus untuk
-            mendaftarkan anggota, memilih kategori kompetisi, dan mengelola
-            pengumpulan karya.
-          </p>
-        </div>
-
-        {/* Action Button */}
-        <div>
-          <Button
-            onClick={onClick}
-            className="bg-[#1a0b8c] hover:bg-[#13076b] text-white font-medium px-6 h-11 rounded-lg flex items-center gap-2 transition-all"
-          >
-            Buat Tim <ArrowRight className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      {/* disabled kalau user belum pilih lomba dari halaman Dashboard —
+          endpoint create team butuh competitionSlug, jadi mencegah user
+          nyasar ke sini tanpa itu lebih baik daripada biarin klik lalu
+          gagal pas submit. */}
+      <Button
+        onClick={onClick}
+        disabled={disabled}
+        title={
+          disabled
+            ? "Pilih lomba terlebih dahulu dari halaman Dashboard"
+            : undefined
+        }
+        className="bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium h-11 rounded-lg w-fit px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Buat Tim →
+      </Button>
+    </div>
   );
 }

@@ -116,7 +116,7 @@ export default function SponsorPage() {
                 key={item}
                 className="border-none shadow-sm bg-white rounded-2xl hover:shadow-md transition-shadow"
               >
-                <CardContent className="p-6 flex items-center justify-center aspect-[4/3] md:aspect-video">
+                <CardContent className="p-6 flex items-center justify-center aspect-4/3 md:aspect-video">
                   {/* Placeholder Logo Gold */}
                   <div className="text-slate-300 flex flex-col items-center">
                     <ImageIcon className="w-8 h-8 mb-2" />

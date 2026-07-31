@@ -21,7 +21,7 @@ export default function Competitions() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Kategori Kompetisi</h2>
+          <h2 className="text-4xl font-bold">Kategori Kompetisi</h2>
           <p className="text-slate-500 mt-2">
             Pilih kategori yang sesuai dengan passion dan keahlian tim Anda.
           </p>
@@ -53,7 +53,7 @@ export default function Competitions() {
                 </Badge>
               </div>
             </div>
-            <p className="text-sm text-slate-500 max-w-[240px] mb-6 relative z-10">
+            <p className="text-sm text-slate-500 max-w-60 mb-6 relative z-10">
               Rancang antarmuka web yang responsif, modern, dan berfokus pada
               pengalaman pengguna yang inklusif.
             </p>
@@ -93,7 +93,7 @@ export default function Competitions() {
                 </Badge>
               </div>
             </div>
-            <p className="text-sm text-blue-100 max-w-[240px] mb-6 relative z-10">
+            <p className="text-sm text-blue-100 max-w-60 mb-6 relative z-10">
               Ciptakan solusi desain yang intuitif dan estetik untuk memecahkan
               masalah pengguna.
             </p>
@@ -203,9 +203,11 @@ export default function Competitions() {
             </div>
           </div>
 
-          <Button className="bg-blue-700 hover:bg-blue-800 rounded-full w-fit mt-2">
+          {/* <Link href={"/register"} className="cursor-pointer"> */}
+          <Button className="bg-[#2F2FE4] w-fit hover:bg-indigo-800 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md px-6 py-[1.15rem] text-sm font-medium">
             Daftar Seminar
           </Button>
+          {/* </Link> */}
         </div>
       </motion.div>
     </section>

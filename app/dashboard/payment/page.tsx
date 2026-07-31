@@ -43,15 +43,23 @@ export default function PaymentPage() {
               <PaymentMethod
                 title="Transfer Bank"
                 provider="Bank Mandiri"
-                accountNumber="123-456-7890"
-                accountName="Panitia IITC 2026"
+                accountNumber="683901020736507"
+                accountName="Maylinda Eka Saputri"
                 icon={Landmark}
               />
               <PaymentMethod
                 title="E-Wallet"
-                provider="Dana / GoPay"
-                accountNumber="0812-3456-7890"
+                provider="GoPay"
+                accountNumber="082137805336"
+                accountName="Maylinda Eka Saputri"
                 icon={Wallet}
+              />
+              <PaymentMethod
+                title="Transfer Bank"
+                provider="Seabank"
+                accountNumber="901912316510"
+                accountName="Tifa Fitriana"
+                icon={Landmark}
               />
             </div>
 

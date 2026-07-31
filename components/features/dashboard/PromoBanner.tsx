@@ -33,7 +33,7 @@ export default function PromoBanner({ onIkutiLombaClick }: PromoBannerProps) {
         {/* 2. Hubungkan event onClick ke prop onIkutiLombaClick */}
         <Button
           onClick={onIkutiLombaClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-6 py-6 shadow-md shadow-blue-200 transition-transform hover:-translate-y-0.5"
+          className="bg-[#2F2FE4] hover:bg-blue-800 text-white rounded-lg px-6 py-6 shadow-md shadow-blue-200 transition-transform hover:-translate-y-0.5"
         >
           Ikuti Lomba <ArrowRight className="ml-2 w-4 h-4" />
         </Button>

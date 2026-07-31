@@ -3,15 +3,30 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { loginSchema, type LoginInput } from "@/lib/schemas/auth.schema";
+import { useLogin, getAuthErrorMessage } from "@/features/auth/hooks/use-login";
 export default function LoginForm() {
-  // State untuk toggle lihat password (opsional, praktik UX yang baik)
   const [showPassword, setShowPassword] = useState(false);
+  const loginMutation = useLogin();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (values: LoginInput) => {
+    loginMutation.mutate(values);
+  };
 
   return (
     <motion.div
@@ -31,7 +46,14 @@ export default function LoginForm() {
       </div>
 
       {/* Formulir */}
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+        {/* Error umum dari server (mis. "Email atau password salah") */}
+        {loginMutation.isError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {getAuthErrorMessage(loginMutation.error)}
+          </div>
+        )}
+
         {/* Input Email */}
         <div className="space-y-2">
           <Label htmlFor="email" className="text-slate-700 font-medium">
@@ -44,8 +66,12 @@ export default function LoginForm() {
               type="email"
               className="pl-11 bg-white border-slate-200 h-12 focus-visible:ring-[#2e2be3]"
               placeholder="nama@email.com"
+              {...register("email")}
             />
           </div>
+          {errors.email && (
+            <p className="text-sm text-red-500">{errors.email.message}</p>
+          )}
         </div>
 
         {/* Input Password */}
@@ -60,12 +86,13 @@ export default function LoginForm() {
               type={showPassword ? "text" : "password"}
               className="pl-11 pr-12 bg-white border-slate-200 h-12 focus-visible:ring-[#2e2be3]"
               placeholder="••••••••"
+              {...register("password")}
             />
-            {/* Tombol mata ditambahkan untuk UX, bisa dihapus jika ingin persis 100% seperti gambar */}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              tabIndex={-1}
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -74,6 +101,9 @@ export default function LoginForm() {
               )}
             </button>
           </div>
+          {errors.password && (
+            <p className="text-sm text-red-500">{errors.password.message}</p>
+          )}
         </div>
 
         {/* Lupa Password Link */}
@@ -87,8 +117,20 @@ export default function LoginForm() {
         </div>
 
         {/* Tombol Submit */}
-        <Button className="w-full bg-[#2e2be3] hover:bg-[#2523b8] text-white h-12 rounded-lg text-base font-medium transition-colors shadow-sm flex items-center justify-center gap-2">
-          Masuk <ArrowRight className="w-5 h-5" />
+        <Button
+          type="submit"
+          disabled={loginMutation.isPending}
+          className="w-full bg-[#2F2FE4] hover:bg-[#2523b8] text-white h-12 rounded-lg text-base font-medium transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-70"
+        >
+          {loginMutation.isPending ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" /> Memproses...
+            </>
+          ) : (
+            <>
+              Masuk <ArrowRight className="w-5 h-5" />
+            </>
+          )}
         </Button>
       </form>
 

@@ -1,29 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreateTeamModalProps } from "@/types/index";
+import { Loader2 } from "lucide-react";
+import type { CreateTeamModalProps } from "@/types/team-type";
+import {
+  createTeamSchema,
+  type CreateTeamInput,
+} from "@/lib/schemas/team.schema";
+import {
+  useJoinCompetition,
+  getJoinCompetitionErrorMessage,
+} from "@/features/team/hooks/use-join-competition";
 
 export default function CreateTeamModal({
   isOpen,
   onClose,
   onCreateTeam,
+  competitionSlug,
 }: CreateTeamModalProps) {
-  const [teamName, setTeamName] = useState("");
+  const joinCompetitionMutation = useJoinCompetition(competitionSlug ?? "");
 
-  const handleCreate = () => {
-    // Jika kosong, gunakan nama default sesuai placeholder desain
-    const finalName = teamName.trim() === "" ? "Majapahit Tech" : teamName;
-    onCreateTeam(finalName);
-    setTeamName(""); // reset form
-    onClose();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateTeamInput>({
+    resolver: zodResolver(createTeamSchema),
+  });
+
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      onClose();
+      setTimeout(() => {
+        reset();
+        joinCompetitionMutation.reset();
+      }, 200);
+    }
+  };
+
+  const onSubmit = (values: CreateTeamInput) => {
+    // Jaga-jaga: tombol pemicu modal ini seharusnya sudah disabled kalau
+    // competitionSlug kosong (lihat CreateTeamCard di team/page.tsx), tapi
+    // dicek lagi di sini supaya gak ada request ngaco ke /api/teams/undefined.
+    if (!competitionSlug) return;
+
+    joinCompetitionMutation.mutate(values, {
+      onSuccess: (response) => {
+        onCreateTeam(response.data.team);
+        reset();
+        onClose();
+      },
+    });
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-[480px] p-8 rounded-2xl border-none shadow-xl bg-white [&>button]:hidden">
         <DialogTitle className="hidden">Buat Tim Baru</DialogTitle>
 
@@ -37,37 +74,57 @@ export default function CreateTeamModal({
             </p>
           </div>
 
-          <div className="space-y-2 pt-2">
-            <Label
-              htmlFor="teamName"
-              className="text-sm font-medium text-slate-900"
-            >
-              Nama Tim
-            </Label>
-            <Input
-              id="teamName"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              placeholder="Masukkan nama tim (misal: Majapahit Tech)"
-              className="h-12 bg-slate-50/50 border-slate-200 focus-visible:ring-[#1a0b8c] text-slate-900"
-            />
-          </div>
+          {joinCompetitionMutation.isError && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {getJoinCompetitionErrorMessage(joinCompetitionMutation.error)}
+            </div>
+          )}
 
-          <div className="flex items-center justify-end gap-2 pt-6">
-            <Button
-              variant="ghost"
-              onClick={onClose}
-              className="text-[#1a0b8c] hover:bg-indigo-50 hover:text-[#13076b] font-semibold px-6 h-11"
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleCreate}
-              className="bg-[#1a0b8c] hover:bg-[#13076b] text-white font-medium px-8 h-11 rounded-lg"
-            >
-              Buat Tim
-            </Button>
-          </div>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <div className="space-y-2 pt-2">
+              <Label
+                htmlFor="teamName"
+                className="text-sm font-medium text-slate-900"
+              >
+                Nama Tim
+              </Label>
+              <Input
+                id="teamName"
+                placeholder="Masukkan nama tim (misal: Majapahit Tech)"
+                className="h-12 bg-slate-50/50 border-slate-200 ring-1 focus-visible:ring-[#2F2FE4] text-slate-900"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name.message}</p>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-6">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onClose}
+                disabled={joinCompetitionMutation.isPending}
+                className="text-[#2F2FE4] hover:bg-indigo-50 hover:text-[#13076b] font-semibold px-6 h-11"
+              >
+                Batal
+              </Button>
+              <Button
+                type="submit"
+                disabled={joinCompetitionMutation.isPending}
+                className="bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium px-8 h-11 rounded-lg disabled:opacity-70"
+              >
+                {joinCompetitionMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Membuat...
+                  </>
+                ) : (
+                  "Buat Tim"
+                )}
+              </Button>
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

@@ -14,7 +14,7 @@ export default function Hero() {
         transition={{ duration: 0.5 }}
         className="flex-1 space-y-6"
       >
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-xs font-medium text-indigo-700">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary bg-[#F0F2FC] px-4 py-1.5 text-xs font-medium text-indigo-700">
           <span className="w-1.5 h-1.5 rounded-full bg-indigo-600" />
           Pendaftaran Telah Dibuka
         </div>
@@ -24,7 +24,7 @@ export default function Hero() {
           <span className="block font-extrabold text-slate-900">
             Masa Depan,
           </span>
-          <span className="block font-extrabold text-indigo-700">
+          <span className="block font-extrabold text-primary">
             <span className="relative inline-block">
               Warisan
               <svg
@@ -53,7 +53,7 @@ export default function Hero() {
 
         <div className="flex flex-wrap gap-4 pt-2">
           <Link href={"/register"} className="cursor-pointer">
-            <Button className="bg-indigo-700 hover:bg-indigo-800 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md px-7 py-5 text-sm font-medium">
+            <Button className="bg-primary hover:bg-indigo-800 rounded-tl-2xl rounded-br-2xl rounded-tr-md rounded-bl-md px-7 py-5 text-sm font-medium">
               Daftar Sekarang
             </Button>
           </Link>
@@ -72,9 +72,9 @@ export default function Hero() {
         transition={{ duration: 0.5, delay: 0.2 }}
         className="flex-1 w-full flex justify-center"
       >
-        <div className="relative w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] flex items-center justify-center">
+        <div className="relative w-[320px] h-80 sm:w-95 sm:h-95 flex items-center justify-center">
           {/* Blob warna lembut di belakang, memberi kedalaman */}
-          <div className="absolute w-[260px] h-[260px] sm:w-[300px] sm:h-[300px] rounded-full bg-indigo-100 blur-2xl opacity-60" />
+          <div className="absolute w-65 h-65 sm:w-75 sm:h-75 rounded-full bg-indigo-100 blur-2xl opacity-60" />
           <div className="absolute -bottom-6 -right-2 w-40 h-40 rounded-full bg-orange-100 blur-2xl opacity-60" />
 
           {/* Bingkai diamond dashed sebagai aksen sudut */}
@@ -98,7 +98,7 @@ export default function Hero() {
             }}
           />
 
-          <div className="relative w-[320px] h-[320px] sm:w-[380px] sm:h-[380px] rounded-full border-2 border-dashed border-slate-300 bg-white/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="relative w-[320px] h-80 sm:w-95 sm:h-95 rounded-full border-2 border-dashed border-slate-300 bg-white/40 backdrop-blur-sm flex items-center justify-center">
             <Image
               src={maskotIITC}
               alt="Maskot IITC"

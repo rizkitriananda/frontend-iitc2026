@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 
 export default function MediaPartners() {
-  // Placeholder nama media partner (Bisa diganti image logo nanti)
   const partners = [
     "TECH MEDIA",
     "INNOVATE.ID",
@@ -18,7 +17,7 @@ export default function MediaPartners() {
   return (
     <section className="w-full py-12">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2">Media Partner</h2>
+        <h2 className="text-4xl font-bold mb-2">Media Partner</h2>
         <p className="text-slate-500">
           Berkolaborasi menyebarkan semangat inovasi budaya.
         </p>
@@ -26,8 +25,8 @@ export default function MediaPartners() {
 
       <div className="relative w-full border border-slate-200 rounded-2xl bg-slate-50/50 p-6 overflow-hidden">
         {/* Fade di kedua sisi supaya transisi marquee terlihat halus */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-slate-50 to-transparent z-10" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-slate-50 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-linear-to-r from-slate-50 to-transparent z-10" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-linear-to-l from-slate-50 to-transparent z-10" />
 
         <motion.div
           className="flex gap-4 w-max"
@@ -43,7 +42,6 @@ export default function MediaPartners() {
               key={index}
               className="flex items-center justify-center px-8 h-14 shrink-0 bg-white border border-slate-200 rounded-xl shadow-sm"
             >
-              {/* Tempat untuk logo <img> sebenarnya, untuk saat ini pakai teks */}
               <span className="font-bold text-slate-700 text-sm tracking-wide whitespace-nowrap">
                 {partner}
               </span>

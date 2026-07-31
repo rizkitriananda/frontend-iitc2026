@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/dashboard/", "/manajemen-tim/", "/admin/"], // Sembunyikan halaman internal
+      disallow: ["/dashboard/", "/team/", "/admin/"], // Sembunyikan halaman internal
     },
     sitemap: "https://lombanasional.com/sitemap.xml",
   };

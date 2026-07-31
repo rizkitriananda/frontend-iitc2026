@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
+  User,
   Wallet,
   CloudUpload,
   GraduationCap,
@@ -15,13 +16,16 @@ import {
   LogOut,
   Bell,
   Menu,
+  Loader2,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import maskotIITC from "@/public/Maskot2.svg";
+import { useLogout } from "@/features/auth/hooks/use-logout";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: User, label: "Profil Saya", href: "/dashboard/profile" },
   { icon: Users, label: "Manajemen Tim", href: "/dashboard/team" },
   { icon: Wallet, label: "Pembayaran", href: "/dashboard/payment" },
   { icon: CloudUpload, label: "Unggah Karya", href: "/dashboard/submission" },
@@ -33,6 +37,14 @@ const menuItems = [
 // baik di sidebar desktop (statis) maupun di dalam Sheet (drawer mobile).
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const logoutMutation = useLogout();
+
+  const handleLogout = () => {
+    // Tutup drawer mobile dulu (kalau ada) sebelum proses logout jalan,
+    // biar gak ada flicker UI drawer nutup bareng redirect.
+    onNavigate?.();
+    logoutMutation.mutate();
+  };
 
   return (
     <div className="flex flex-col justify-between h-full">
@@ -65,12 +77,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 className={`relative flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-medium transition-colors ${
                   isActive
-                    ? "text-blue-700 bg-blue-50 font-semibold"
+                    ? "text-[#2F2FE4] bg-blue-50 font-semibold"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
                 {isActive && (
-                  <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-full bg-blue-600" />
+                  <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-1.5 h-6 rounded-full bg-[#2F2FE4]" />
                 )}
                 <item.icon className="w-5 h-5 shrink-0" />
                 {item.label}
@@ -88,14 +100,25 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
         >
           <Settings className="w-5 h-5" /> Settings
-        </Link>{" "}
-        <Link
-          href="/"
-          onClick={onNavigate}
-          className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-slate-100 transition-colors w-full text-left"
-        >
-          <LogOut className="w-5 h-5" /> Logout
         </Link>
+
+        {/* Tombol logout — sengaja pakai <button>, bukan <Link>, karena ini
+            memicu aksi (POST ke server + hapus cookie httpOnly), bukan
+            navigasi murni. Link ke "/" sebelumnya TIDAK benar-benar logout
+            — token httpOnly tetap ada, cuma pindah halaman. */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
+          className="flex items-center gap-3 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-red-600 hover:bg-slate-100 transition-colors w-full text-left disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {logoutMutation.isPending ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <LogOut className="w-5 h-5" />
+          )}
+          {logoutMutation.isPending ? "Memproses..." : "Logout"}
+        </button>
       </div>
     </div>
   );
