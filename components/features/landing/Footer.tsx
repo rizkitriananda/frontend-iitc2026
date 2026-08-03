@@ -22,12 +22,12 @@ const InstagramIcon = ({ className }: { className?: string }) => (
     <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 );
-
 const socialIcons = [
-  { icon: Mail, href: "#", label: "Email" },
+  // !TODO Change Tiktok icon
+  { icon: Mail, href: "https://www.tiktok.com/@iitc_intermedia", label: "Email" },
   { icon: Globe, href: "https://www.intermediaamikom.org/", label: "Website" },
-  { icon: InstagramIcon, href: "https://www.instagram.com/intermedia_amikompwt/", label: "Instagram" },
-  { icon: MessageSquare, href: "#", label: "Forum" }
+  { icon: InstagramIcon, href: "https://www.instagram.com/iitc_intermedia/", label: "Instagram" },
+  { icon: MessageSquare, href: "wa.me/6285133711081", label: "Whatsapp" }
 ];
 
 export default function Footer() {
@@ -38,7 +38,7 @@ export default function Footer() {
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
-          
+
           {/* Kiri: Logo, Judul & Sosial */}
           <div className="flex flex-col items-center lg:items-start gap-5">
             <div className="flex gap-4">
