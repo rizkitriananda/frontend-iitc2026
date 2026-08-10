@@ -1,3 +1,4 @@
+import { LucideIcon } from "lucide-react";
 export interface TimeLeft {
   days: number;
   hours: number;
@@ -12,6 +13,21 @@ export interface DeadlineCardProps {
   label?: string;
 }
 
+// timeline
+export type MarkerShape = "diamond" | "circle" | "filled";
+export type BadgeVariant = "blue" | "orange" | "white";
+
+export interface TimelineItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  date: string;
+  icon: LucideIcon;
+  markerShape: MarkerShape;
+  badgeVariant: BadgeVariant;
+  align: "left" | "right";
+}
 export interface CompetitionCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;

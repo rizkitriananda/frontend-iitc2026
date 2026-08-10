@@ -2,7 +2,7 @@ import Hero from "@/components/features/landing/Hero";
 import About from "@/components/features/landing/About";
 import Countdown from "@/components/features/landing/Countdown";
 import Competitions from "@/components/features/landing/Competitions";
-import Timeline from "@/components/features/landing/Timeline";
+import Timeline from "@/components/features/landing/timeline/Timeline";
 import MediaPartners from "@/components/features/landing/MediaPartners";
 import FAQ from "@/components/features/landing/FAQ";
 import Sponsors from "@/components/features/landing/Sponsor";
