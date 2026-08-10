@@ -1,4 +1,3 @@
-// features/profile/hooks/use-update-profile.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 
@@ -11,14 +10,11 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: updateProfile,
     onSuccess: () => {
-      // Invalidate query agar UI (form, avatar, status keanggotaan) otomatis
-      // ter-refresh dengan data profil terbaru dari server.
       queryClient.invalidateQueries({ queryKey: ["user-profile"] });
     },
   });
 }
 
-// Helper untuk ambil pesan error yang enak dibaca dari AxiosError
 export function getProfileErrorMessage(error: unknown): string {
   if (isAxiosError<ApiErrorResponse>(error)) {
     const validationErrors = error.response?.data?.errors;

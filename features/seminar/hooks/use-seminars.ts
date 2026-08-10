@@ -1,4 +1,3 @@
-// features/seminar/hooks/use-seminars.ts
 import { useQuery } from "@tanstack/react-query";
 import { getSeminars } from "../api/get-seminars";
 

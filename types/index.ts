@@ -242,6 +242,7 @@ export interface GetSeminarsResponse {
     seminars: SeminarItem[];
   };
 }
+
 // sponsor
 export interface Sponsor {
   id: number;

@@ -1,4 +1,3 @@
-// features/team/hooks/use-submit-team-work.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 
@@ -11,9 +10,6 @@ export function useSubmitTeamWork() {
   return useMutation({
     mutationFn: submitTeamWork,
     onSuccess: () => {
-      // Konsisten dengan queryKey asli yang dipakai useMyTeam
-      // (TEAM_QUERY_KEYS.myTeamDetail = ["my-team-detail"]) supaya UI
-      // langsung refresh menampilkan link yang baru disimpan.
       queryClient.invalidateQueries({
         queryKey: ["my-competitions"],
       });
@@ -24,7 +20,6 @@ export function useSubmitTeamWork() {
   });
 }
 
-// Helper pesan error khusus submit karya
 export function getSubmitTeamWorkErrorMessage(error: unknown): string {
   if (isAxiosError<ApiErrorResponse>(error)) {
     return (

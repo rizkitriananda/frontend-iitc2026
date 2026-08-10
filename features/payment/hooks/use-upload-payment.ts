@@ -10,15 +10,12 @@ export function useUploadPayment() {
   return useMutation({
     mutationFn: uploadPayment,
     onSuccess: () => {
-      // Invalidate query agar UI status pembayaran otomatis ter-refresh (menunggu verifikasi)
-      // Sesuaikan queryKey ini dengan key yang kamu pakai untuk get status tim/kompetisi
       queryClient.invalidateQueries({ queryKey: ["my-competitions"] });
       queryClient.invalidateQueries({ queryKey: ["payment-status"] });
     },
   });
 }
 
-// Helper untuk ambil pesan error yang enak dibaca dari AxiosError
 export function getPaymentErrorMessage(error: unknown): string {
   if (isAxiosError<ApiErrorResponse>(error)) {
     return (

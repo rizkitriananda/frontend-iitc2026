@@ -1,4 +1,3 @@
-// features/team/hooks/use-manage-team.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { deleteTeam, leaveTeam, removeMember } from "../api/manage-team";

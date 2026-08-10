@@ -1,4 +1,3 @@
-// features/profile/api/get-profile.ts
 import { api } from "@/lib/api/axios";
 import type { ProfileResponse } from "@/types/profile-type";
 

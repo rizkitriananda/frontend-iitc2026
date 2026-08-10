@@ -1,4 +1,3 @@
-// features/sponsor/api/get-sponsors.ts
 import axios from "axios";
 import type { GetSponsorsResponse } from "@/types/index";
 

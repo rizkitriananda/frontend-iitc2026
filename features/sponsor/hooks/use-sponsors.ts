@@ -1,4 +1,3 @@
-// features/sponsor/hooks/use-sponsors.ts
 import { useQuery } from "@tanstack/react-query";
 import { getSponsors } from "../api/get-sponsors";
 

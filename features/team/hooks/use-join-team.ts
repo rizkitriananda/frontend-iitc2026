@@ -1,4 +1,3 @@
-// features/team/hooks/use-join-team.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 

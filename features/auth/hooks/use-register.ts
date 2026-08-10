@@ -9,8 +9,6 @@ export function useRegister() {
   return useMutation({
     mutationFn: register,
     onSuccess: () => {
-      // Register TIDAK membuat sesi login (tidak ada cookie yang di-set),
-      // jadi arahkan ke /login supaya user login manual dengan akun barunya.
       router.push("/login?registered=1");
     },
   });

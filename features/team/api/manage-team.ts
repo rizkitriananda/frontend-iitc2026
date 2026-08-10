@@ -1,4 +1,3 @@
-// features/team/api/manage-team.ts
 import { api } from "@/lib/api/axios";
 
 export async function deleteTeam() {

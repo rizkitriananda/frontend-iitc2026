@@ -14,14 +14,7 @@ export function useJoinCompetition(competitionSlug: string) {
     mutationFn: (input: CreateTeamInput) =>
       joinCompetition(competitionSlug, input),
     onSuccess: () => {
-      // Tim baru dibuat -> data "kompetisi milik saya" (kalau nanti dipakai
-      // di halaman lain, mis. dashboard/team) jadi basi. Invalidate supaya
-      // ke-refetch begitu ada komponen yang butuh, daripada nampilin data
-      // lama yang belum include tim yang baru dibuat.
       queryClient.invalidateQueries({ queryKey: ["my-competitions"] });
-
-      // Arahkan ke halaman Manajemen Tim supaya user lanjut proses
-      // (undang anggota, dst) — bukan cuma nutup modal begitu saja.
       router.push("/dashboard/team");
       router.refresh();
     },
