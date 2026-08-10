@@ -1,4 +1,3 @@
-// app/api/sponsors/route.ts
 import { NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { laravelApi } from "@/lib/api/laravel-server";

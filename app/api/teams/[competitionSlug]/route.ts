@@ -17,11 +17,6 @@ export async function POST(
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
-  // Aksi ini bikin data baru (team) yang terikat ke user yang login, jadi
-  // WAJIB ada token. Kalau tidak ada, middleware harusnya sudah mencegah
-  // user sampai ke /dashboard sama sekali — tapi ini jaga-jaga kalau
-  // Route Handler dipanggil langsung (mis. cookie expired di antara render
-  // halaman dan submit form).
   if (!token) {
     return NextResponse.json<ApiErrorResponse>(
       { message: "Sesi Anda telah berakhir, silakan login ulang" },
@@ -42,8 +37,6 @@ export async function POST(
   }
 
   try {
-    // Laravel-nya nerima multipart/form-data (lihat --form di curl docs),
-    // sama seperti pola /login.
     const form = new FormData();
     form.append("name", parsed.data.name);
 

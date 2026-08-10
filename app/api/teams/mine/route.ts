@@ -1,4 +1,3 @@
-// app/api/teams/mine/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { laravelApi } from "@/lib/api/laravel-server";

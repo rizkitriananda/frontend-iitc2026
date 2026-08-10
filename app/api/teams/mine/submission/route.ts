@@ -1,4 +1,3 @@
-// app/api/teams/mine/submission/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 
@@ -18,15 +17,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // Ambil FormData dari client (field: "submission" berisi link Drive)
     const formData = await request.formData();
 
-    // Teruskan langsung ke Laravel — path sesuai dokumentasi Postman:
-    // POST /api/teams/mine/submission (bukan /teams/mine/update)
     const { data } = await laravelApi.post("/teams/mine/submission", formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        // Axios yang mengurus boundary multipart/form-data otomatis
       },
     });
 

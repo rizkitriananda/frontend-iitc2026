@@ -1,4 +1,3 @@
-// app/api/profile/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { laravelApi } from "@/lib/api/laravel-server";
@@ -45,7 +44,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST — Update Profile via BFF
 export async function POST(request: NextRequest) {
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
 
@@ -61,22 +59,6 @@ export async function POST(request: NextRequest) {
   const contentType = request.headers.get("content-type") || "";
 
   try {
-    // ========================================================================
-    // KASUS FILE UPLOAD (multipart/form-data): avatar dan/atau twibbon.
-    //
-    // PENTING — kenapa TIDAK pakai `await request.formData()` lalu forward
-    // ulang objek FormData-nya: File/Blob yang didapat dari parsing FormData
-    // di SATU request itu gak selalu bisa dipakai aman jadi body di request
-    // LAIN (fetch baru ke Laravel). Metadata (nama file, mimetype) kebawa,
-    // tapi isi binary-nya bisa "hilang"/kosong pas nyampe di server tujuan —
-    // itu yang bikin Laravel bilang "The avatar field must be a file"
-    // walau user sudah pilih file yang benar dan field-nya memang terkirim.
-    //
-    // Solusi paling aman: JANGAN diparsing sama sekali di sini. Teruskan
-    // body request MENTAH (raw stream) apa adanya dari browser langsung ke
-    // Laravel, lengkap dengan Content-Type asli-nya (termasuk boundary).
-    // Next.js/Node butuh `duplex: "half"` setiap kali body berupa stream.
-    // ========================================================================
     if (contentType.includes("multipart/form-data")) {
       const response = await fetch(`${laravelBaseUrl}/profile`, {
         method: "POST",
@@ -85,9 +67,7 @@ export async function POST(request: NextRequest) {
           "Content-Type": contentType,
         },
         body: request.body,
-        // @ts-expect-error -- "duplex" belum ada di tipe RequestInit bawaan
-        // TS/lib.dom.d.ts versi tertentu, tapi wajib di-set saat body berupa
-        // ReadableStream di runtime Node/undici (Next.js App Router).
+        // @ts-expect-error -- "duplex" wajib di-set untuk ReadableStream di Node.js
         duplex: "half",
       });
 
@@ -95,10 +75,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(responseData, { status: response.status });
     }
 
-    // ========================================================================
-    // KASUS TANPA FILE (application/json) — fallback kalau suatu saat ada
-    // pemanggil lain yang update profil tanpa upload apa pun.
-    // ========================================================================
     const jsonBody = await request.json();
     const response = await fetch(`${laravelBaseUrl}/profile`, {
       method: "POST",

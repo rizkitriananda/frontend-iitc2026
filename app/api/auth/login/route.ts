@@ -14,7 +14,6 @@ const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? "token";
 export async function POST(request: Request) {
   const body = await request.json();
 
-  // Validasi ulang di server (jangan cuma percaya validasi client)
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json<ApiErrorResponse>(
@@ -27,9 +26,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Laravel-nya menerima multipart/form-data (bukan JSON) — lihat --form
-    // di contoh curl Postman docs. Kalau dikirim sebagai JSON biasa,
-    // Laravel akan gagal parsing field email/password-nya.
     const form = new FormData();
     form.append("email", parsed.data.email);
     form.append("password", parsed.data.password);
@@ -49,12 +45,11 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // 1 hari — sesuaikan dgn masa berlaku token Sanctum di Laravel
+      maxAge: 60 * 60 * 24,
     });
 
     return response;
   } catch (error) {
-    // DEBUG SEMENTARA: supaya error aslinya kelihatan di terminal npm run dev
     console.error("[POST /api/auth/login] error:", error);
 
     if (isAxiosError<ApiErrorResponse>(error)) {

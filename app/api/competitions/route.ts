@@ -6,10 +6,6 @@ import type { ApiErrorResponse, GetCompetitionsResponse } from "@/types/index";
 
 export async function GET() {
   try {
-    // Endpoint ini public (gak butuh Authorization header) berdasarkan
-    // dokumentasi Postman — tidak ada indikasi butuh Bearer token seperti
-    // /logout. Kalau nanti ternyata Laravel-nya minta auth juga, tinggal
-    // tambahkan header di sini seperti pola di /api/auth/logout.
     const { data } =
       await laravelApi.get<GetCompetitionsResponse>("/competitions");
 

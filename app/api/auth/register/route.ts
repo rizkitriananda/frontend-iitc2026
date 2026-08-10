@@ -24,16 +24,9 @@ export async function POST(request: Request) {
   }
 
   const { fullName, email, phone, password } = parsed.data;
-
-  // Contoh di Postman docs pakai format "08112222333" (awalan 0, tanpa +62),
-  // sedangkan form di UI cuma minta digit setelah +62 (mis. "812xxxxxxx").
-  // Jadi di sini digit depan di-normalisasi jadi awalan "0" sebelum dikirim.
-  // TODO: kalau ternyata Laravel-nya mau format "+62..." atau "62...", ganti baris ini.
   const normalizedPhone = `0${phone.replace(/^0+/, "")}`;
 
   try {
-    // Laravel menerima multipart/form-data (lihat --form di curl Postman docs),
-    // bukan JSON — dan tidak butuh confirmPassword.
     const form = new FormData();
     form.append("fullName", fullName);
     form.append("email", email);
@@ -57,7 +50,6 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
-    // DEBUG SEMENTARA: supaya error aslinya kelihatan di terminal npm run dev
     console.error("[POST /api/auth/register] error:", error);
 
     if (isAxiosError<ApiErrorResponse>(error)) {
