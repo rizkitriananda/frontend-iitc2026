@@ -5,29 +5,24 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, ExternalLink, Loader2 } from "lucide-react";
 
-// Menggunakan env variable untuk kemudahan pembaruan tautan.
-// Catatan: Karena menggunakan NEXT_PUBLIC_, perubahan memerlukan rebuild.
+// Menggunakan env variable untuk fleksibilitas tautan panduan
 const SCRIBE_EMBED_URL =
   process.env.NEXT_PUBLIC_REGISTRATION_GUIDEBOOK_URL ??
   "https://scribehow.com/embed/Register_and_Register_for_a_Competition_on_IITC_Intermedia__IOg8Jtr8SdmHU6XRFkl4vg?skipIntro=true";
 
-// Dihitung di module scope untuk efisiensi render.
 const SCRIBE_SHARED_URL = SCRIBE_EMBED_URL.replace("/embed/", "/shared/");
-
-// Menggunakan tinggi tetap (fixed) untuk mencegah gap kosong berlebih di layar besar.
 const EMBED_HEIGHT_CLASSES = "h-125 sm:h-140 lg:h-155";
 
 interface GuidebookEmbedFrameProps {
   src: string;
 }
 
-// Komponen terpisah untuk menangani state loading dan iframe Scribe.
+// Komponen iframe Scribe dengan indikator loading
 function GuidebookEmbedFrame({ src }: GuidebookEmbedFrameProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
     <div className="relative rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-      {/* Skeleton loading sebagai placeholder selama iframe dimuat. */}
       {!isLoaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-50 z-10">
           <Loader2 className="w-8 h-8 text-[#2F2FE4] animate-spin" />
@@ -81,7 +76,7 @@ export default function RegistrationGuidebookPage() {
 
         <GuidebookEmbedFrame src={SCRIBE_EMBED_URL} />
 
-        {/* Tautan alternatif jika iframe diblokir oleh browser atau ad-blocker. */}
+        {/* Tautan alternatif jika iframe diblokir */}
         <div className="flex items-center justify-center pt-2">
           <a
             href={SCRIBE_SHARED_URL}
