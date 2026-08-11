@@ -1,56 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  LayoutTemplate,
-  PenTool,
-  Bot,
-  Trophy,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Loader2, AlertCircle } from "lucide-react";
+
 import { CompetitionCategoryModalProps, Competition } from "@/types/index";
 import { useCompetitions } from "@/features/competition/hooks/use-competitions";
-
-// API belum mengembalikan field icon, jadi kita map manual berdasarkan slug
-// yang kemungkinan dipakai backend untuk 3 kategori lomba utama. Kalau
-// slug-nya gak cocok satupun (mis. data dummy/seed acak seperti "trever"
-// yang terlihat di contoh response Postman), fallback ke ikon Trophy biar
-// tetap ada visual, bukan kosong.
-const CATEGORY_ICON_MAP: Record<string, typeof LayoutTemplate> = {
-  "web-design": LayoutTemplate,
-  "ui-ux": PenTool,
-  "ui-ux-design": PenTool,
-  "gen-ai": Bot,
-  "gen-ai-video": Bot,
-};
-
-// Key localStorage buat nyimpen slug lomba yang dipilih user, dipakai di
-// halaman lain (mis. Manajemen Tim) buat tahu lomba mana yang sedang
-// diproses tanpa harus lewat query param terus-terusan.
-const SELECTED_COMPETITION_STORAGE_KEY = "selectedCompetitionSlug";
-
-function getCategoryIcon(slug: string) {
-  return CATEGORY_ICON_MAP[slug] ?? Trophy;
-}
-
-function formatPrice(competitionPrice: number | null | undefined): string {
-  if (
-    competitionPrice === null ||
-    competitionPrice === undefined ||
-    competitionPrice === 0
-  ) {
-    return "Gratis";
-  }
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(competitionPrice);
-}
+import {
+  SELECTED_COMPETITION_STORAGE_KEY,
+  RESET_SELECTION_DELAY_MS,
+  CompetitionCard,
+} from "./competition-modal.utils";
 
 export default function CompetitionCategoryModal({
   isOpen,
@@ -59,47 +22,48 @@ export default function CompetitionCategoryModal({
   const router = useRouter();
   const [selectedCompetition, setSelectedCompetition] =
     useState<Competition | null>(null);
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: competitions, isLoading, isError, refetch } = useCompetitions();
 
-  const handleDialogChange = (open: boolean) => {
-    if (!open) {
-      onClose();
-      // Delay reset supaya gak ada flicker konten berubah saat animasi
-      // dialog menutup masih berjalan.
-      setTimeout(() => setSelectedCompetition(null), 300);
-    }
-  };
+  // Bersihkan timeout saat komponen unmount
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
+  }, []);
 
-  const handleLanjutkan = () => {
+  const handleDialogChange = useCallback(
+    (open: boolean) => {
+      if (open) return;
+      onClose();
+      resetTimeoutRef.current = setTimeout(
+        () => setSelectedCompetition(null),
+        RESET_SELECTION_DELAY_MS,
+      );
+    },
+    [onClose],
+  );
+
+  const handleLanjutkan = useCallback(() => {
     if (!selectedCompetition) return;
 
-    // Simpan slug lomba yang dipilih ke localStorage supaya halaman lain
-    // (mis. Manajemen Tim) bisa baca tanpa bergantung ke query param yang
-    // hilang begitu user refresh/navigasi manual.
     try {
       localStorage.setItem(
         SELECTED_COMPETITION_STORAGE_KEY,
         selectedCompetition.slug,
       );
     } catch (err) {
-      // localStorage bisa gagal (mis. private browsing / storage penuh) —
-      // jangan blokir alur user cuma karena ini gagal, cukup log.
       console.error("Gagal menyimpan slug lomba ke localStorage:", err);
     }
 
-    // "Save"-nya di sini bukan lewat API — belum ada endpoint khusus buat
-    // nyimpen "kompetisi yang dipilih" tanpa bikin tim. Jadi kita simpan
-    // slug-nya lewat localStorage + query param, terus arahkan ke halaman
-    // Manajemen Tim. Di sana, card "Buat Tim Baru" yang baca slug ini dan
-    // benar-benar manggil POST /api/teams/:slug begitu user isi nama tim.
     onClose();
     router.push(`/dashboard/team?competitionSlug=${selectedCompetition.slug}`);
-  };
+  }, [selectedCompetition, onClose, router]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleDialogChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] flex flex-col p-0 overflow-hidden bg-white rounded-2xl border-none shadow-2xl">
+      <DialogContent className="sm:max-w-225 max-h-[90vh] flex flex-col p-0 overflow-hidden bg-white rounded-2xl border-none shadow-2xl">
         <DialogTitle className="hidden">Pilih Kategori Lomba</DialogTitle>
 
         {/* Header Modal */}
@@ -112,8 +76,8 @@ export default function CompetitionCategoryModal({
           </p>
         </div>
 
-        {/* Body: Daftar Card Kategori */}
-        <div className="p-8 bg-slate-50/50 min-h-[280px] overflow-y-auto">
+        {/* Content Body */}
+        <div className="p-8 bg-slate-50/50 min-h-70 overflow-y-auto">
           {isLoading && (
             <div className="flex flex-col items-center justify-center h-full py-16 text-slate-400">
               <Loader2 className="w-8 h-8 animate-spin mb-3" />
@@ -137,110 +101,32 @@ export default function CompetitionCategoryModal({
             </div>
           )}
 
-          {!isLoading &&
-            !isError &&
-            competitions &&
-            competitions.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full py-16 text-center">
-                <p className="text-sm text-slate-500">
-                  Belum ada lomba yang tersedia saat ini.
-                </p>
-              </div>
-            )}
+          {!isLoading && !isError && competitions?.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full py-16 text-center">
+              <p className="text-sm text-slate-500">
+                Belum ada lomba yang tersedia saat ini.
+              </p>
+            </div>
+          )}
 
           {!isLoading &&
             !isError &&
             competitions &&
             competitions.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {competitions.map((item) => {
-                  const isSelected = selectedCompetition?.slug === item.slug;
-                  const Icon = getCategoryIcon(item.slug);
-                  const badge =
-                    item.maxMembers <= 1
-                      ? "Individu"
-                      : `Tim (maks ${item.maxMembers} org)`;
-
-                  return (
-                    <div
-                      key={item.slug}
-                      onClick={() => setSelectedCompetition(item)}
-                      className={`flex flex-col bg-white border-2 rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 ${
-                        isSelected
-                          ? "border-[#1a0b8c] shadow-md ring-4 ring-indigo-50"
-                          : "border-slate-100 hover:border-slate-300 shadow-sm"
-                      }`}
-                    >
-                      {/* Ilustrasi Card atas — pakai cover dari API kalau ada,
-                        fallback ke ikon generik kalau gambar gagal load. */}
-                      <div className="h-32 bg-slate-100 flex items-center justify-center relative overflow-hidden group">
-                        {item.cover ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.cover}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <>
-                            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,transparent_25%,rgba(0,0,0,0.05)_25%,rgba(0,0,0,0.05)_50%,transparent_50%,transparent_75%,rgba(0,0,0,0.05)_75%,rgba(0,0,0,0.05)_100%)] bg-[length:20px_20px]"></div>
-                            <Icon
-                              className={`w-12 h-12 relative z-10 transition-transform duration-300 ${isSelected ? "text-[#1a0b8c] scale-110" : "text-[#2e2be3] group-hover:scale-110"}`}
-                            />
-                          </>
-                        )}
-                      </div>
-
-                      {/* Konten Text */}
-                      <div className="p-5 flex flex-col flex-1">
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <h3 className="text-lg font-bold text-slate-900 leading-tight">
-                            {item.name}
-                          </h3>
-                          <span className="bg-slate-100 text-slate-600 text-[10px] px-2 py-1 rounded-full font-medium whitespace-nowrap">
-                            {badge}
-                          </span>
-                        </div>
-
-                        {/* CATATAN: field description & price BELUM ada di
-                          response GET /api/competitions (list) per
-                          dokumentasi terbaru — cuma ada di endpoint detail
-                          (GET /api/competitions/:slug). Blok ini otomatis
-                          kepakai begitu backend menambahkannya ke list
-                          endpoint. */}
-                        {item.description && (
-                          <p className="text-sm text-slate-500 leading-relaxed mb-3 flex-1">
-                            {item.description}
-                          </p>
-                        )}
-
-                        <p className="text-sm font-semibold text-[#1a0b8c] mb-4">
-                          {formatPrice(item.competitionPrice)}
-                        </p>
-
-                        {/* Tombol Pilih dalam Card */}
-                        <Button
-                          variant={isSelected ? "default" : "outline"}
-                          className={`w-full font-semibold h-10 mt-auto ${
-                            isSelected
-                              ? "bg-[#1a0b8c] hover:bg-[#13076b] text-white border-transparent"
-                              : "border-[#1a0b8c] text-[#1a0b8c] hover:bg-indigo-50"
-                          }`}
-                        >
-                          {isSelected ? "Terpilih" : "Pilih Lomba"}
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
+                {competitions.map((item) => (
+                  <CompetitionCard
+                    key={item.slug}
+                    item={item}
+                    isSelected={selectedCompetition?.slug === item.slug}
+                    onSelect={setSelectedCompetition}
+                  />
+                ))}
               </div>
             )}
         </div>
 
-        {/* Footer */}
+        {/* Footer Actions */}
         <div className="px-8 py-5 flex items-center justify-end gap-3 bg-white border-t border-slate-100">
           <Button
             variant="ghost"
@@ -252,11 +138,12 @@ export default function CompetitionCategoryModal({
           <Button
             onClick={handleLanjutkan}
             disabled={!selectedCompetition}
-            className={`font-medium px-8 h-11 shadow-sm transition-colors ${
+            className={cn(
+              "font-medium px-8 h-11 shadow-sm transition-colors",
               selectedCompetition
                 ? "bg-[#1a0b8c] hover:bg-[#13076b] text-white"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed"
-            }`}
+                : "bg-slate-200 text-slate-400 cursor-not-allowed",
+            )}
           >
             Lanjutkan
           </Button>
