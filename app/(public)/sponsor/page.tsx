@@ -84,7 +84,7 @@ export default function SponsorPage() {
   }
 
   const sponsors = data?.data?.sponsors ?? [];
-  
+
   const platinumSponsors = sponsors.filter(
     (s) => s.tier.toLowerCase() === "platinum",
   );
@@ -96,10 +96,10 @@ export default function SponsorPage() {
     (s) => s.tier.toLowerCase() === "bronze",
   );
   const inKindSponsors = sponsors.filter(
-    (s) => 
-      s.tier.toLowerCase() === "in kind" || 
-      s.tier.toLowerCase() === "inkind" || 
-      s.tier.toLowerCase() === "in-kind"
+    (s) =>
+      s.tier.toLowerCase() === "in kind" ||
+      s.tier.toLowerCase() === "inkind" ||
+      s.tier.toLowerCase() === "in-kind",
   );
 
   const hasNoSponsors =
@@ -302,7 +302,7 @@ export default function SponsorPage() {
           </motion.section>
         )}
 
-        {/* CTA Jadi Sponsor - Disesuaikan dengan Color Palette Primary */}
+        {/* CTA Jadi Sponsor */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

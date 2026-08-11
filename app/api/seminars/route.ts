@@ -1,26 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+// app/api/seminars/route.ts
+import { NextResponse } from "next/server";
 import { isAxiosError } from "axios";
 import { laravelApi } from "@/lib/api/laravel-server";
 import type { ApiErrorResponse } from "@/types/index";
 
-const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? "token";
-
-export async function GET(request: NextRequest) {
-  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
-
-  if (!token) {
-    return NextResponse.json(
-      { message: "Unauthorized. Silakan login kembali." },
-      { status: 401 },
-    );
-  }
-
+export async function GET() {
   try {
-    const { data } = await laravelApi.get("/seminars", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data } = await laravelApi.get("/seminars");
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

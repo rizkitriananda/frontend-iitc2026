@@ -1,4 +1,3 @@
-// components/features/dashboard/seminar/SeminarInfoCard.tsx
 "use client";
 
 import { useState } from "react";
@@ -6,7 +5,6 @@ import { Calendar, MapPin, ExternalLink, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import posterSeminar from "@/public/seminar-iitc2026.png";
 import { useSeminars } from "@/features/seminar/hooks/use-seminars";
 import SeminarNotOpenModal from "./SeminarNotOpenModal";
 
@@ -55,7 +53,7 @@ export default function SeminarInfoCard() {
 
   const gformUrl =
     seminar?.registrationLink || "https://iitc.intermediaamikom.org/";
-  const posterSource = seminar?.posterUrl || posterSeminar;
+  const posterSource = seminar?.posterUrl || "";
 
   const isRegistrationOpen = (() => {
     if (!rawStartDate) return false;
