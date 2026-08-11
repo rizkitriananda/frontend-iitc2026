@@ -1,19 +1,17 @@
-// app/(dashboard)/dashboard/profile/page.tsx
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Tambahkan import useRouter
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import maskotIITC from "@/public/Maskot2.svg";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
+import maskotIITC from "@/public/Maskot2.svg";
+import { Button } from "@/components/ui/button";
+
 import ProfileTabs from "@/components/features/dashboard/profile/ProfileTabs";
 import ProfileAvatarCard from "@/components/features/dashboard/profile/ProfileAvatarCard";
-import ProfileInfoForm, {
-  type ProfileFormValues,
-} from "@/components/features/dashboard/profile/ProfileInfoForm";
+import ProfileInfoForm from "@/components/features/dashboard/profile/ProfileInfoForm";
 import TwibbonUploadCard from "@/components/features/dashboard/profile/TwibbonUploadCard";
 import MembershipStatusCard from "@/components/features/dashboard/profile/MembershipStatusCard";
 import ProfileSkeleton from "@/components/features/dashboard/profile/ProfileSkeleton";
@@ -24,102 +22,42 @@ import {
   getProfileErrorMessage,
 } from "@/features/profile/hooks/use-update-profile";
 import { useMyTeam } from "@/features/team/hooks/use-my-team";
-import type { ProfileUser, ProfileDetail } from "@/types/profile-type";
+import {
+  deriveProfileState,
+  type ResponseDataStructure,
+  type ProfileUserWithParticipant,
+  type ExtendedProfileDetail,
+} from "@/components/features/dashboard/profile/profile.utils";
+import type { ProfileFormValues } from "@/components/features/dashboard/profile/ProfileInfoForm";
 
-interface ExtendedProfileDetail extends ProfileDetail {
-  avatar?: string | null;
-  twibbon?: string | null;
-  grade?: string;
-  institution?: string;
-  student_id_number?: string;
-  gender?: string;
-}
-
-interface ProfileUserWithParticipant extends ProfileUser {
-  participant?: ExtendedProfileDetail;
-}
-
-interface ResponseDataStructure {
-  user?: ProfileUserWithParticipant;
-}
-
-const EMPTY_FORM_VALUES: ProfileFormValues = {
-  fullName: "",
-  grade: "pelajar",
-  institution: "",
-  email: "",
-  phone: "",
-  nisnOrNim: "",
-  gender: "",
-};
-
-interface DerivedProfileState {
-  formValues: ProfileFormValues;
-  avatarUrl: string | null;
-  twibbonUrl: string | null;
-}
-
-function deriveProfileState(
-  userData?: ProfileUserWithParticipant,
-  detailData?: ExtendedProfileDetail,
-): DerivedProfileState {
-  return {
-    formValues: {
-      fullName: userData?.name || "",
-      grade: detailData?.grade || "pelajar",
-      institution: detailData?.institution || "",
-      email: userData?.email || "",
-      phone: userData?.phone || "",
-      nisnOrNim: detailData?.student_id_number || "",
-      gender: detailData?.gender || "",
-    },
-    avatarUrl: detailData?.avatar || userData?.avatar || null,
-    twibbonUrl: detailData?.twibbon || null,
-  };
-}
-
-export default function ProfilePage() {
+// Komponen form editor profil
+function ProfileEditor({
+  userData,
+  detailData,
+  teamData,
+}: {
+  userData?: ProfileUserWithParticipant;
+  detailData?: ExtendedProfileDetail;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  teamData?: any;
+}) {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const router = useRouter(); // Inisialisasi router
-
-  const { data: profileResponse, isLoading: isProfileLoading } = useProfile();
-  const { data: teamResponse } = useMyTeam(true);
   const updateProfileMutation = useUpdateProfile();
 
-  const responseData = profileResponse?.data as
-    | ResponseDataStructure
-    | undefined;
-  const userData = responseData?.user;
-  const detailData = userData?.participant;
-  const teamData = teamResponse?.data?.team;
+  const initialDerivedState = deriveProfileState(userData, detailData);
 
+  const [formValues, setFormValues] = useState<ProfileFormValues>(
+    initialDerivedState.formValues,
+  );
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    initialDerivedState.avatarUrl,
+  );
   const [twibbonFile, setTwibbonFile] = useState<File | null>(null);
   const [twibbonPreviewUrl, setTwibbonPreviewUrl] = useState<string | null>(
-    null,
+    initialDerivedState.twibbonUrl,
   );
-  const [formValues, setFormValues] =
-    useState<ProfileFormValues>(EMPTY_FORM_VALUES);
-
-  const [syncedResponse, setSyncedResponse] =
-    useState<typeof profileResponse>(undefined);
-
-  if (profileResponse !== syncedResponse) {
-    setSyncedResponse(profileResponse);
-
-    if (userData || detailData) {
-      const derived = deriveProfileState(userData, detailData);
-      setFormValues(derived.formValues);
-
-      if (derived.avatarUrl && !avatarFile) {
-        setAvatarPreview(derived.avatarUrl);
-      }
-      if (derived.twibbonUrl && !twibbonFile) {
-        setTwibbonPreviewUrl(derived.twibbonUrl);
-      }
-    }
-  }
 
   const handleChangeAvatar = (file: File) => {
     setAvatarFile(file);
@@ -132,14 +70,11 @@ export default function ProfilePage() {
   };
 
   const handleCancel = () => {
-    if (!userData && !detailData) return;
-
-    const derived = deriveProfileState(userData, detailData);
-    setFormValues(derived.formValues);
+    setFormValues(initialDerivedState.formValues);
     setAvatarFile(null);
     setTwibbonFile(null);
-    setAvatarPreview(derived.avatarUrl);
-    setTwibbonPreviewUrl(derived.twibbonUrl);
+    setAvatarPreview(initialDerivedState.avatarUrl);
+    setTwibbonPreviewUrl(initialDerivedState.twibbonUrl);
     toast.info("Perubahan dibatalkan.");
   };
 
@@ -152,29 +87,20 @@ export default function ProfilePage() {
     formData.append("institution", formValues.institution);
     formData.append("phone", formValues.phone);
     formData.append("gender", formValues.gender);
-    if (formValues.nisnOrNim) {
+    if (formValues.nisnOrNim)
       formData.append("student_id_number", formValues.nisnOrNim);
-    }
     if (avatarFile) formData.append("avatar", avatarFile);
     if (twibbonFile) formData.append("twibbon", twibbonFile);
 
     updateProfileMutation.mutate(formData, {
       onSuccess: () => {
         toast.success("Profil berhasil diperbarui!");
-        setAvatarFile(null);
-        setTwibbonFile(null);
         queryClient.invalidateQueries({ queryKey: ["user-profile"] });
-
-        // Redirect ke halaman dashboard
         router.push("/dashboard");
       },
       onError: (error) => toast.error(getProfileErrorMessage(error)),
     });
   };
-
-  if (isProfileLoading) {
-    return <ProfileSkeleton />;
-  }
 
   return (
     <motion.div
@@ -227,14 +153,14 @@ export default function ProfilePage() {
             variant="outline"
             onClick={handleCancel}
             disabled={updateProfileMutation.isPending}
-            className="border-slate-200 text-slate-700 hover:bg-slate-50 font-medium h-11 px-6 rounded-lg cursor-pointer transition-colors"
+            className="border-slate-200 text-slate-700 hover:bg-slate-50 font-medium h-11 px-6 rounded-lg transition-colors"
           >
             Batal
           </Button>
           <Button
             type="submit"
             disabled={updateProfileMutation.isPending}
-            className="bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium h-11 px-6 rounded-lg disabled:opacity-70 cursor-pointer transition-colors"
+            className="bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium h-11 px-6 rounded-lg disabled:opacity-70 transition-colors"
           >
             {updateProfileMutation.isPending
               ? "Menyimpan..."
@@ -243,5 +169,29 @@ export default function ProfilePage() {
         </div>
       </form>
     </motion.div>
+  );
+}
+
+// Komponen utama pemuat data profil
+export default function ProfilePage() {
+  const { data: profileResponse, isLoading: isProfileLoading } = useProfile();
+  const { data: teamResponse } = useMyTeam(true);
+
+  if (isProfileLoading) return <ProfileSkeleton />;
+
+  const responseData = profileResponse?.data as
+    | ResponseDataStructure
+    | undefined;
+  const userData = responseData?.user;
+  const detailData = userData?.participant;
+  const teamData = teamResponse?.data?.team;
+
+  return (
+    <ProfileEditor
+      key={userData?.id || "new-profile"}
+      userData={userData}
+      detailData={detailData}
+      teamData={teamData}
+    />
   );
 }
