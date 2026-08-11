@@ -3,10 +3,8 @@ import { cookies } from "next/headers";
 import { isAxiosError } from "axios";
 
 import { laravelApi } from "@/lib/api/laravel-server";
-import type {
-  ApiErrorResponse,
-  GetMyCompetitionsResponse,
-} from "@/types/team-type";
+import type { GetMyCompetitionsResponse } from "@/types/team-type";
+import type { ApiErrorResponse } from "@/types";
 
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? "token";
 
