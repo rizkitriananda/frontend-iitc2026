@@ -13,7 +13,7 @@ export default function CertificateCard() {
   return (
     <Card className="border-slate-200/80 shadow-sm rounded-3xl overflow-hidden bg-white relative">
       {/* Garis Gradasi Mewah di Bagian Atas Card */}
-      <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 via-indigo-500 to-amber-400"></div>
+      <div className="absolute top-0 left-0 right-0 h-2 bg-linear-to-r from-blue-600 via-indigo-500 to-amber-400"></div>
 
       <CardContent className="p-8 sm:p-12 flex flex-col items-center">
         {/* PREVIEW SERTIFIKAT (KOTAK PUTIH DI DALAM) */}
@@ -31,7 +31,7 @@ export default function CertificateCard() {
           <p className="text-xs text-slate-400 mb-2">Diberikan kepada</p>
 
           {/* Nama Penerima */}
-          <h4 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-6 min-w-[220px]">
+          <h4 className="text-xl sm:text-2xl font-bold text-slate-900 border-b border-slate-200 pb-2 mb-6 min-w-55">
             Alex Iskandar
           </h4>
 

@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/PaymentSuccessModal.tsx
 "use client";
 
 import Link from "next/link";

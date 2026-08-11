@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/WhatsAppGroupCard.tsx
 import { UserPlus, MessageCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 

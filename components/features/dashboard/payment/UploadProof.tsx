@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/UploadProof.tsx
 "use client";
 
 import { useState } from "react";

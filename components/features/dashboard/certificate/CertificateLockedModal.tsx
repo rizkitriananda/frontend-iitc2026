@@ -18,7 +18,7 @@ export default function CertificateLockedModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         onInteractOutside={(e) => e.preventDefault()}
-        className="sm:max-w-[480px] p-8 rounded-3xl border-none shadow-2xl bg-white flex flex-col items-center text-center"
+        className="sm:max-w-120 p-8 rounded-3xl border-none shadow-2xl bg-white flex flex-col items-center text-center"
       >
         <DialogTitle className="hidden">Lomba Belum Berakhir</DialogTitle>
 

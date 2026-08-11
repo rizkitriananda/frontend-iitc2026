@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/PaymentInstructions.tsx
 import { ListOrdered } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -20,8 +19,8 @@ export default function PaymentInstructions({ fee }: PaymentInstructionsProps) {
   const instructions = [
     <>
       Transfer biaya pendaftaran sebesar{" "}
-      <strong className="font-bold text-slate-900">{formattedFee}</strong>
-      . (Pastikan nominal yang terkirim utuh dan tidak terpotong biaya admin beda
+      <strong className="font-bold text-slate-900">{formattedFee}</strong>.
+      (Pastikan nominal yang terkirim utuh dan tidak terpotong biaya admin beda
       bank/e-wallet).
     </>,
     "Simpan bukti transfer dalam format JPG atau PNG.",

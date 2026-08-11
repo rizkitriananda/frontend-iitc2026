@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/TwibbonRequirementModal.tsx
 import Link from "next/link";
 import { Megaphone, MessageCircle, UserCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";

@@ -1,5 +1,4 @@
-// components/features/dashboard/payment/PaymentMethod.tsx
-"use client"; // Wajib ditambahkan agar fungsi onClick & copy berjalan di browser
+"use client";
 
 import { Copy, Check } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";

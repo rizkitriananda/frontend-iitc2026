@@ -1,4 +1,3 @@
-// components/features/dashboard/payment/PaymentStatus.tsx
 import { CalendarClock, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
