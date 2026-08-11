@@ -1,13 +1,14 @@
-// app/(dashboard)/dashboard/team/page.tsx
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import maskotIITC from "@/public/Maskot2.svg";
 import { toast } from "sonner";
 
+import maskotIITC from "@/public/Maskot2.svg";
+
+// Komponen Fitur Team
 import CreateTeamCard from "@/components/features/dashboard/team/CreateTeamCard";
 import JoinTeamCard from "@/components/features/dashboard/team/JoinTeamCard";
 import CreateTeamModal from "@/components/features/dashboard/team/CreateTeamModal";
@@ -29,21 +30,14 @@ import {
   getManageTeamErrorMessage,
 } from "@/features/team/hooks/use-manage-team";
 import { useProfile } from "@/features/profile/hooks/use-profile";
-import type { ProfileDetail } from "@/types/profile-type";
-
-// Import key konstan dari tempat yang tersentralisasi (contoh mengambil dari useLogout jika diletakkan di sana, atau deklarasikan ulang secara konsisten)
+import type { ExtendedProfileUser } from "@/types";
 import { SELECTED_COMPETITION_STORAGE_KEY } from "@/features/auth/hooks/use-logout";
 
-interface ExtendedProfileUser {
-  name?: string;
-  email?: string;
-  phone?: string;
-  participant?: ProfileDetail & {
-    institution?: string;
-    gender?: string;
-    twibbon?: string;
-  };
-}
+// Utils
+import {
+  checkHasTeam,
+  determineUserRole,
+} from "@/components/features/dashboard/team/team.utils";
 
 function TeamPageContent() {
   const searchParams = useSearchParams();
@@ -53,6 +47,7 @@ function TeamPageContent() {
   const [activeSlug, setActiveSlug] = useState<string | null>(urlSlug);
   const [isCreateTeamOpen, setIsCreateTeamOpen] = useState(false);
 
+  // --- Sinkronisasi Slug Kompetisi & LocalStorage ---
   useEffect(() => {
     const timer = setTimeout(() => {
       if (urlSlug) {
@@ -63,15 +58,28 @@ function TeamPageContent() {
         const storedSlug = localStorage.getItem(
           SELECTED_COMPETITION_STORAGE_KEY,
         );
-        if (storedSlug) {
-          setActiveSlug(storedSlug);
-        }
+        if (storedSlug) setActiveSlug(storedSlug);
       }
     }, 0);
     return () => clearTimeout(timer);
   }, [urlSlug, router]);
 
+  // --- Fetching Data ---
   const { data: profileResponse, isLoading: isProfileLoading } = useProfile();
+  const { data: myTeamsSummary, isLoading: isSummaryLoading } =
+    useMyCompetitions();
+
+  const hasTeam = checkHasTeam(myTeamsSummary);
+  const { data: teamDetailResponse, isLoading: isDetailLoading } =
+    useMyTeam(hasTeam);
+
+  // --- Mutations ---
+  const deleteMutation = useDeleteTeam();
+  const leaveMutation = useLeaveTeam();
+  const removeMutation = useRemoveMember();
+  const joinMutation = useJoinTeam();
+
+  // --- Validasi Profil & Tim ---
   const user = profileResponse?.data?.user as ExtendedProfileUser | undefined;
   const participant = user?.participant;
   const userEmail = user?.email;
@@ -83,38 +91,12 @@ function TeamPageContent() {
     participant?.gender,
   );
 
-  const { data: myTeamsSummary, isLoading: isSummaryLoading } =
-    useMyCompetitions();
-
-  let hasTeam = false;
-  if (Array.isArray(myTeamsSummary)) {
-    hasTeam = myTeamsSummary.length > 0;
-  } else if (myTeamsSummary && typeof myTeamsSummary === "object") {
-    const summaryData = myTeamsSummary as { data?: unknown[] };
-    hasTeam = Array.isArray(summaryData.data) && summaryData.data.length > 0;
-  }
-
-  const { data: teamDetailResponse, isLoading: isDetailLoading } =
-    useMyTeam(hasTeam);
-
-  const teamDetail = teamDetailResponse?.data;
-  const team = teamDetail?.team;
+  const team = teamDetailResponse?.data?.team;
   const members = team?.members;
-  const competition = team?.competition?.name;
+  const competitionName = team?.competition?.name;
+  const role = determineUserRole(team?.leader?.email, userEmail);
 
-  const deleteMutation = useDeleteTeam();
-  const leaveMutation = useLeaveTeam();
-  const removeMutation = useRemoveMember();
-  const joinMutation = useJoinTeam();
-
-  const leaderEmail = team?.leader?.email?.toLowerCase().trim();
-  const activeUserEmail = userEmail?.toLowerCase().trim();
-
-  const role: "leader" | "member" =
-    leaderEmail && activeUserEmail && leaderEmail === activeUserEmail
-      ? "leader"
-      : "member";
-
+  // --- Handlers ---
   const handleTeamCreated = () => {
     router.replace("/dashboard/team");
   };
@@ -140,7 +122,6 @@ function TeamPageContent() {
     deleteMutation.mutate(undefined, {
       onSuccess: () => {
         toast.success("Tim berhasil dihapus.");
-        // Bersihkan localStorage juga setelah tim dihapus (opsional)
         localStorage.removeItem(SELECTED_COMPETITION_STORAGE_KEY);
         setActiveSlug(null);
       },
@@ -181,12 +162,13 @@ function TeamPageContent() {
               competitionSlug={activeSlug}
             />
           )}
+
           {hasTeam && team ? (
             <ActiveTeamDashboard
               teamName={team.name}
               role={role}
               teamCode={team.code}
-              competitionName={competition}
+              competitionName={competitionName}
               guideBookUrl={team?.competition?.guide_book}
               leader={team.leader}
               members={members}
@@ -202,6 +184,7 @@ function TeamPageContent() {
             />
           ) : (
             <>
+              {/* Watermark Maskot */}
               <div className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 opacity-[0.03] pointer-events-none z-0 flex items-center justify-center">
                 <div className="w-full h-full rounded-full flex items-center justify-center">
                   <Image
