@@ -18,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+
+// Komponen Dashboard & Modals
 import SuccessModal from "@/components/features/dashboard/submission/SuccessModal";
 import StepGuardModal from "@/components/features/dashboard/StepGuardModal";
 import SubmissionStatusBadge from "@/components/features/dashboard/submission/SubmissionStatusBadge";
@@ -29,6 +31,7 @@ import {
   RequirementList,
 } from "@/components/features/dashboard/submission/submission-requirements";
 
+// Hooks & Utils
 import { useMyCompetitions } from "@/features/team/hooks/use-my-competitions";
 import { useMyTeam } from "@/features/team/hooks/use-my-team";
 import { useProfile } from "@/features/profile/hooks/use-profile";
@@ -37,64 +40,23 @@ import {
   useSubmitTeamWork,
   getSubmitTeamWorkErrorMessage,
 } from "@/features/team/hooks/use-submit-team-work";
-import type { ProfileDetail } from "@/types/profile-type";
-
-interface ExtendedProfileUser {
-  name?: string;
-  email?: string;
-  phone?: string;
-  participant?: ProfileDetail & {
-    institution?: string;
-    gender?: string;
-    twibbon?: string;
-  };
-}
-
-const VALID_PAYMENT_STATUSES = ["valid", "success", "accepted"];
-
-const WHATSAPP_GROUP_BY_COMPETITION: { keywords: string[]; url: string }[] = [
-  {
-    keywords: ["web design", "webdesign"],
-    url: "https://chat.whatsapp.com/GPk3ial29LvHRkYGdNmIe3",
-  },
-  {
-    keywords: ["ui/ux", "uiux", "ui"],
-    url: "https://chat.whatsapp.com/HgPrSs3uZ32AYGCE8myQh4",
-  },
-  {
-    keywords: ["gen ai", "genai", "ai"],
-    url: "https://chat.whatsapp.com/HA3xyTpiNnuIsCPQFwEY3C",
-  },
-];
-
-function getWhatsAppGroupUrl(competitionName?: string): string {
-  if (!competitionName) return "#";
-  const name = competitionName.toLowerCase();
-  const match = WHATSAPP_GROUP_BY_COMPETITION.find((entry) =>
-    entry.keywords.some((keyword) => name.includes(keyword)),
-  );
-  return match?.url ?? "#";
-}
-
-function computeSubmissionTimeStatus(): "before" | "after" | "active" {
-  const now = new Date();
-  const startDate = new Date("2026-08-19T00:00:00+07:00");
-  const endDate = new Date("2026-08-27T23:59:59+07:00");
-
-  if (now < startDate) return "before";
-  if (now > endDate) return "after";
-  return "active";
-}
+import {
+  VALID_PAYMENT_STATUSES,
+  computeSubmissionTimeStatus,
+  getWhatsAppGroupUrl,
+  type ExtendedProfileUser,
+} from "@/components/features/dashboard/submission/submission.utils";
 
 export default function UploadWorkPage() {
+  // --- States ---
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [userEditedLink, setUserEditedLink] = useState<string | null>(null);
   const [isModalDismissed, setIsModalDismissed] = useState(false);
-
   const [timeStatus] = useState<"before" | "after" | "active">(
     computeSubmissionTimeStatus,
   );
 
+  // --- Fetching Data ---
   const { data: profileResponse, isLoading: isProfileLoading } = useProfile();
   const { data: myTeamsSummary, isLoading: isSummaryLoading } =
     useMyCompetitions();
@@ -102,12 +64,12 @@ export default function UploadWorkPage() {
   const hasTeam = Array.isArray(myTeamsSummary) && myTeamsSummary.length > 0;
   const { data: teamDetailResponse, isLoading: isDetailLoading } =
     useMyTeam(hasTeam);
-
   const { data: paymentResponse, isLoading: isPaymentLoading } =
     usePaymentStatus();
 
   const submitMutation = useSubmitTeamWork();
 
+  // --- Evaluasi Validasi Status ---
   const user = profileResponse?.data?.user as ExtendedProfileUser | undefined;
   const participant = user?.participant;
   const userEmail = user?.email;
@@ -127,11 +89,8 @@ export default function UploadWorkPage() {
     paymentStatus && VALID_PAYMENT_STATUSES.includes(paymentStatus),
   );
 
-  // LOGIKA PRIORITAS MODAL
-  // StepGuard akan aktif jika salah satu dari ketiga ini belum selesai
   const isStepGuardActive =
     !isProfileComplete || !isTeamComplete || !isPaymentComplete;
-
   const hasTwibbon = Boolean(participant?.twibbon);
 
   const showTwibbonModal =
@@ -148,15 +107,14 @@ export default function UploadWorkPage() {
 
   const driveLink =
     userEditedLink !== null ? userEditedLink : team?.submissionLink || "";
-
   const isAlreadySubmitted = Boolean(team?.submissionLink?.trim());
 
   const isLoading =
     isSummaryLoading || isDetailLoading || isProfileLoading || isPaymentLoading;
-
   const canShowContent =
     isProfileComplete && isTeamComplete && isPaymentComplete && Boolean(team);
 
+  // --- Handlers ---
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!driveLink.trim() || !team || !isLeader || timeStatus !== "active")
@@ -176,9 +134,7 @@ export default function UploadWorkPage() {
     );
   };
 
-  if (isLoading) {
-    return <SubmissionSkeleton />;
-  }
+  if (isLoading) return <SubmissionSkeleton />;
 
   const competition = team?.competition;
   const competitionName = competition?.name || competition?.title || "";
@@ -189,11 +145,7 @@ export default function UploadWorkPage() {
 
   return (
     <div className="relative w-full min-h-[calc(100vh-5rem)] flex flex-col items-center">
-      {/* 
-        MODIFIKASI DI SINI: 
-        SubmissionPeriodModal hanya muncul jika isStepGuardActive bernilai FALSE 
-        (artinya pengguna sudah lolos semua pengecekan persyaratan)
-      */}
+      {/* Modal Periode Pengumpulan */}
       <SubmissionPeriodModal
         isOpen={
           !isStepGuardActive &&
@@ -202,6 +154,7 @@ export default function UploadWorkPage() {
         status={timeStatus}
       />
 
+      {/* Pengaman Step Pendaftaran */}
       <StepGuardModal
         isProfileComplete={isProfileComplete}
         isTeamComplete={isTeamComplete}
@@ -209,13 +162,14 @@ export default function UploadWorkPage() {
         requiredStep="submission"
       />
 
-      {/* Modal Wajib Upload Twibbon */}
+      {/* Modal Peringatan Twibbon */}
       <TwibbonRequirementModal
         isOpen={showTwibbonModal}
         onClose={() => setIsModalDismissed(true)}
         whatsappUrl={whatsappGroupUrl}
       />
 
+      {/* Modal Sukses Unggah */}
       <SuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
@@ -228,6 +182,7 @@ export default function UploadWorkPage() {
           transition={{ duration: 0.4 }}
           className="w-full space-y-10 relative z-10 pb-12"
         >
+          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 mb-2">
@@ -240,14 +195,12 @@ export default function UploadWorkPage() {
                 </span>
               </p>
             </div>
-
             <SubmissionStatusBadge isSubmitted={isAlreadySubmitted} />
           </div>
 
+          {/* Info Ketua Tim */}
           <div className="w-full bg-[#f0f4ff] border border-[#d6e0ff] rounded-xl p-4 flex items-start gap-3 shadow-sm">
-            <div className="mt-0.5">
-              <Info className="w-5 h-5 text-[#2F2FE4]" />
-            </div>
+            <Info className="w-5 h-5 text-[#2F2FE4] mt-0.5 shrink-0" />
             <div>
               <h4 className="text-sm font-semibold text-[#2F2FE4] mb-1">
                 Informasi Ketua Tim ({team.leader?.name || "Ketua"})
@@ -259,6 +212,7 @@ export default function UploadWorkPage() {
             </div>
           </div>
 
+          {/* Panduan & Persyaratan Kompetisi */}
           <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden bg-white">
             <CardContent className="p-8 space-y-6">
               <div className="flex items-center gap-2 text-slate-900">
@@ -278,6 +232,7 @@ export default function UploadWorkPage() {
             </CardContent>
           </Card>
 
+          {/* Form Input Link Drive */}
           <Card className="border-slate-200 shadow-sm rounded-2xl overflow-hidden bg-white">
             <CardContent className="p-8">
               <form onSubmit={handleSave} className="space-y-6">
@@ -343,6 +298,7 @@ export default function UploadWorkPage() {
             </CardContent>
           </Card>
 
+          {/* Instruksi Akses Drive */}
           <Card className="border-dashed border-2 border-slate-200 shadow-none rounded-2xl bg-[#fafafa]">
             <CardContent className="p-6 flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 shrink-0 mt-0.5">
