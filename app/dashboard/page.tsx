@@ -15,18 +15,7 @@ import DashboardSkeleton from "@/components/features/dashboard/DashboardSkeleton
 import { useProfile } from "@/features/profile/hooks/use-profile";
 import { useMyTeam } from "@/features/team/hooks/use-my-team";
 import { usePaymentStatus } from "@/features/payment/hooks/use-payment-status";
-import type { ProfileDetail } from "@/types/profile-type";
-
-interface ExtendedProfileUser {
-  name?: string;
-  email?: string;
-  phone?: string;
-  participant?: ProfileDetail & {
-    institution?: string;
-    gender?: string;
-    twibbon?: string;
-  };
-}
+import type { ExtendedProfileUser } from "@/types/profile-type";
 
 interface ProfileResponseData {
   user?: ExtendedProfileUser;

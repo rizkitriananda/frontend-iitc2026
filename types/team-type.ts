@@ -13,24 +13,20 @@ export interface JoinCompetitionResponse {
 export interface MyTeamSummary {
   id: number;
   name: string;
-  code?: string; // Tambahkan properti kode tim
+  code?: string;
   title: string;
   submissionLink: string | null;
-
   leader: {
     id: number;
     name: string;
-    email: string; // Tambahkan email leader
+    email: string;
     avatar?: string;
   };
-
   members?: Array<{
-    // Tambahkan array members
     id: string | number;
     name: string;
     email: string;
   }>;
-
   competition: {
     id: number;
     name: string;
@@ -56,7 +52,9 @@ export interface CreateTeamModalProps {
   competitionSlug?: string | null;
 }
 
-export interface ApiErrorResponse {
-  message: string;
-  errors?: Record<string, string[]>; // format error validasi khas Laravel
+export interface UpdateTeamInput {
+  name: string;
+  title: string;
+  submission?: string;
+  avatar?: File | null;
 }

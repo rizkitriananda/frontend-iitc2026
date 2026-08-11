@@ -1,10 +1,9 @@
-// app/(dashboard)/dashboard/payment/page.tsx
 "use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Landmark, Wallet } from "lucide-react";
 
+// Compoenent UI
 import LeaderAlert from "@/components/features/dashboard/payment/LeaderAlert";
 import PaymentStatus from "@/components/features/dashboard/payment/PaymentStatus";
 import PaymentMethod from "@/components/features/dashboard/payment/PaymentMethod";
@@ -16,98 +15,35 @@ import PaymentPageSkeleton from "@/components/features/dashboard/payment/Payment
 import TwibbonRequirementModal from "@/components/features/dashboard/payment/TwibbonRequirementModal";
 import AdminFeeNoticeModal from "@/components/features/dashboard/payment/AdminFeeNoticeModal";
 
-// Import hooks
+// Konstanta & Helper
+import {
+  PAYMENT_METHODS,
+  VERIFIED_STATUSES,
+  getWhatsAppGroupUrl,
+} from "@/components/features/dashboard/payment/payment.constants";
+
+// Hooks
 import { usePaymentStatus } from "@/features/payment/hooks/use-payment-status";
 import { useMyTeam } from "@/features/team/hooks/use-my-team";
 import { useProfile } from "@/features/profile/hooks/use-profile";
-import type { ProfileDetail } from "@/types/profile-type";
 
-interface ExtendedProfileUser {
-  name?: string;
-  email?: string;
-  phone?: string;
-  participant?: ProfileDetail & {
-    institution?: string;
-    gender?: string;
-    twibbon?: string;
-  };
-}
-
-const VERIFIED_STATUSES = ["VALID", "ACCEPTED", "SUCCESS"];
-
-type PaymentMethodConfig = {
-  title: string;
-  provider: string;
-  accountNumber: string;
-  accountName: string;
-  icon: typeof Wallet;
-  fullWidth?: boolean;
-};
-
-const PAYMENT_METHODS: PaymentMethodConfig[] = [
-  {
-    title: "E-Wallet",
-    provider: "DANA",
-    accountNumber: "082137805336",
-    accountName: "Maylinda Eka Saputri",
-    icon: Wallet,
-  },
-  {
-    title: "Transfer Bank",
-    provider: "BRI",
-    accountNumber: "683901020736507",
-    accountName: "Maylinda Eka Saputri",
-    icon: Landmark,
-  },
-  {
-    title: "Transfer Bank",
-    provider: "Seabank",
-    accountNumber: "901912316510",
-    accountName: "Tifa Fitriana",
-    icon: Landmark,
-    fullWidth: true,
-  },
-];
-
-const WHATSAPP_GROUP_BY_COMPETITION: { keywords: string[]; url: string }[] = [
-  {
-    keywords: ["web design", "webdesign"],
-    url: "https://chat.whatsapp.com/GPk3ial29LvHRkYGdNmIe3",
-  },
-  {
-    keywords: ["ui/ux", "uiux", "ui"],
-    url: "https://chat.whatsapp.com/HgPrSs3uZ32AYGCE8myQh4",
-  },
-  {
-    keywords: ["gen ai", "genai", "ai"],
-    url: "https://chat.whatsapp.com/HA3xyTpiNnuIsCPQFwEY3C",
-  },
-];
-
-function getWhatsAppGroupUrl(competitionName?: string): string {
-  if (!competitionName) return "#";
-  const name = competitionName.toLowerCase();
-  const match = WHATSAPP_GROUP_BY_COMPETITION.find((entry) =>
-    entry.keywords.some((keyword) => name.includes(keyword)),
-  );
-  return match?.url ?? "#";
-}
+import type { ExtendedProfileUser } from "@/types";
 
 export default function PaymentPage() {
+  // Fetch Data
   const { data: profileResponse, isLoading: isProfileLoading } = useProfile();
-  const { data: teamDetailResponse, isLoading: isTeamLoading } =
-    useMyTeam(true);
+  const { data: teamResponse, isLoading: isTeamLoading } = useMyTeam(true);
   const { data: statusResponse, isLoading: isStatusLoading } =
     usePaymentStatus();
 
-  // State untuk melacak penutupan modal manual di sesi ini
+  // State Modal (Dismiss)
   const [isTwibbonModalDismissed, setIsTwibbonModalDismissed] = useState(false);
   const [isFeeModalDismissed, setIsFeeModalDismissed] = useState(false);
 
-  // Evaluasi Profil dengan casting aman
+  // --- Evaluasi Profil ---
   const user = profileResponse?.data?.user as ExtendedProfileUser | undefined;
   const participant = user?.participant;
-
+  const hasTwibbon = Boolean(participant?.twibbon);
   const isProfileComplete = Boolean(
     user?.name &&
     user?.phone &&
@@ -115,40 +51,32 @@ export default function PaymentPage() {
     participant?.gender,
   );
 
-  // Evaluasi Tim
-  const team = teamDetailResponse?.data?.team;
+  // --- Evaluasi Tim & Kompetisi ---
+  const team = teamResponse?.data?.team;
   const isTeamComplete = Boolean(team);
-
-  // Data Pembayaran
-  const { status: currentStatus, reason: rejectReason } =
-    statusResponse?.data?.payment ?? {};
-
-  const rawStatus = currentStatus?.toUpperCase() ?? "";
-
-  const isPaymentVerified = VERIFIED_STATUSES.includes(rawStatus);
-  const isPaymentPending = rawStatus === "PENDING";
-
-  // Mengecek apakah user sudah upload twibbon di profilnya
-  const hasTwibbon = Boolean(participant?.twibbon);
-
-  // Logika Kemunculan Modal Twibbon (Jika SUDAH Bayar)
-  const showTwibbonModal =
-    isPaymentVerified && !hasTwibbon && !isTwibbonModalDismissed;
-
-  // Logika Kemunculan Modal Pemberitahuan Biaya (Hanya Jika BELUM Bayar atau INVALID/REJECTED)
-  const showFeeModal =
-    isProfileComplete &&
-    isTeamComplete &&
-    !isPaymentVerified &&
-    !isPaymentPending && // Modal tidak akan muncul saat status PENDING
-    !isFeeModalDismissed;
-
-  // Data Kompetisi
   const competition = team?.competition;
   const competitionName = competition?.name || competition?.title || "";
   const competitionPrice = competition?.price;
   const whatsappGroupUrl = getWhatsAppGroupUrl(competitionName);
 
+  // --- Evaluasi Pembayaran ---
+  const { status: currentStatus, reason: rejectReason } =
+    statusResponse?.data?.payment ?? {};
+  const rawStatus = currentStatus?.toUpperCase() ?? "";
+  const isPaymentVerified = VERIFIED_STATUSES.includes(rawStatus);
+  const isPaymentPending = rawStatus === "PENDING";
+
+  // --- Logika Kemunculan Modal ---
+  const showTwibbonModal =
+    isPaymentVerified && !hasTwibbon && !isTwibbonModalDismissed;
+  const showFeeModal =
+    isProfileComplete &&
+    isTeamComplete &&
+    !isPaymentVerified &&
+    !isPaymentPending &&
+    !isFeeModalDismissed;
+
+  // --- Render Status Loading ---
   if (isStatusLoading || isTeamLoading || isProfileLoading) {
     return (
       <div className="w-full min-h-[calc(100vh-5rem)] flex flex-col items-center pt-8">
@@ -157,15 +85,16 @@ export default function PaymentPage() {
     );
   }
 
+  // --- Render Utama ---
   return (
     <div className="relative w-full min-h-[calc(100vh-5rem)] flex flex-col items-center">
+      {/* Pengaman Akses (Step Guard) */}
       <StepGuardModal
         isProfileComplete={isProfileComplete}
         isTeamComplete={isTeamComplete}
         requiredStep="payment"
       />
 
-      {/* Render pop-up Modal Informasi Biaya (Bagi yang belum bayar atau invalid) */}
       <AdminFeeNoticeModal
         isOpen={showFeeModal}
         onClose={() => setIsFeeModalDismissed(true)}
@@ -173,7 +102,6 @@ export default function PaymentPage() {
         fee={competitionPrice}
       />
 
-      {/* Render pop-up Modal Twibbon (Bagi yang sudah diverifikasi) */}
       <TwibbonRequirementModal
         isOpen={showTwibbonModal}
         onClose={() => setIsTwibbonModalDismissed(true)}

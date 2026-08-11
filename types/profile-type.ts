@@ -1,5 +1,3 @@
-// types/profile-type.ts
-
 export interface ProfileUser {
   id: string;
   name: string;
@@ -19,6 +17,18 @@ export interface ProfileDetail {
   user_id?: string;
   updated_at?: string;
   created_at?: string;
+}
+
+// Digunakan di Payment Page / Dashboard
+export interface ExtendedProfileUser {
+  name?: string;
+  email?: string;
+  phone?: string;
+  participant?: ProfileDetail & {
+    institution?: string;
+    gender?: string;
+    twibbon?: string;
+  };
 }
 
 export interface ProfileResponse {
