@@ -19,14 +19,13 @@ interface GuardConfig {
   btn: string;
 }
 
-// Fungsi murni untuk menentukan tahapan mana yang harus diselesaikan lebih dulu
+// Menentukan konfigurasi modal berdasarkan tahapan yang belum terpenuhi
 function resolveGuardConfig({
   isProfileComplete,
   isTeamComplete,
   isPaymentComplete,
   requiredStep,
 }: StepGuardModalProps): GuardConfig | null {
-  // 1. Validasi Profil (Paling utama, berlaku untuk SEMUA halaman)
   if (!isProfileComplete) {
     return {
       title: "Profil Belum Lengkap",
@@ -37,7 +36,6 @@ function resolveGuardConfig({
     };
   }
 
-  // 2. Validasi Tim (Berlaku untuk Pembayaran & Unggah Karya)
   if (
     (requiredStep === "payment" || requiredStep === "submission") &&
     !isTeamComplete
@@ -51,7 +49,6 @@ function resolveGuardConfig({
     };
   }
 
-  // 3. Validasi Pembayaran (Hanya berlaku untuk Unggah Karya)
   if (requiredStep === "submission" && !isPaymentComplete) {
     return {
       title: "Pembayaran Belum Selesai",
@@ -62,13 +59,11 @@ function resolveGuardConfig({
     };
   }
 
-  // Semua syarat terpenuhi -> tidak perlu modal
   return null;
 }
 
 export default function StepGuardModal(props: StepGuardModalProps) {
   const router = useRouter();
-
   const config = resolveGuardConfig(props);
   const isOpen = config !== null;
 
@@ -88,26 +83,18 @@ export default function StepGuardModal(props: StepGuardModalProps) {
         <h2 className="text-xl font-bold text-slate-900 mb-2">
           {config?.title}
         </h2>
-
         <p className="text-sm text-slate-500 mb-6 leading-relaxed">
           {config?.message}
         </p>
 
-        {/* Tombol Aksi & Navigasi */}
         <div className="flex flex-col gap-3 w-full">
-          {/* Tombol utama: Mengarahkan ke step sebelumnya yang harus diselesaikan */}
           <Button
-            onClick={() => {
-              if (config) {
-                router.push(config.redirect);
-              }
-            }}
+            onClick={() => config && router.push(config.redirect)}
             className="w-full bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium h-12 rounded-xl shadow-sm transition-colors"
           >
             {config?.btn}
           </Button>
 
-          {/* Tombol sekunder: Kembali ke halaman utama Dashboard */}
           <Button
             variant="ghost"
             onClick={() => router.push("/dashboard")}

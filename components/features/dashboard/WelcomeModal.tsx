@@ -19,21 +19,18 @@ export default function WelcomeModal({
   isProfileComplete,
 }: WelcomeModalProps) {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
-  const router = useRouter(); // Gunakan router untuk navigasi
+  const router = useRouter();
 
   useEffect(() => {
-    // Hanya buka modal otomatis jika profil belum lengkap
     if (!isProfileComplete) {
-      const timer = setTimeout(() => {
-        setIsWelcomeOpen(true);
-      }, 300);
+      const timer = setTimeout(() => setIsWelcomeOpen(true), 300);
       return () => clearTimeout(timer);
     }
   }, [isProfileComplete]);
 
   const handleOpenProfile = () => {
-    setIsWelcomeOpen(false); // Tutup modal
-    router.push("/dashboard/profile"); // Arahkan ke halaman profil
+    setIsWelcomeOpen(false);
+    router.push("/dashboard/profile");
   };
 
   return (

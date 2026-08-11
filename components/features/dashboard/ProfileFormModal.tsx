@@ -30,7 +30,7 @@ export default function ProfileFormModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
         onInteractOutside={(e) => e.preventDefault()}
-        className="sm:max-w-none w-screen h-[100dvh] m-0 p-0 rounded-none border-none bg-slate-50 flex flex-col overflow-hidden [&>button]:hidden"
+        className="sm:max-w-none w-screen h-dvh m-0 p-0 rounded-none border-none bg-slate-50 flex flex-col overflow-hidden [&>button]:hidden"
       >
         <DialogTitle className="hidden">Lengkapi Profil Form</DialogTitle>
 
