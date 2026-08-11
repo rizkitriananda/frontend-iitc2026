@@ -4,10 +4,8 @@ import { isAxiosError } from "axios";
 
 import { laravelApi } from "@/lib/api/laravel-server";
 import { joinTeamSchema } from "@/lib/schemas/team.schema";
-import type {
-  ApiErrorResponse,
-  JoinTeamAsMemberResponse,
-} from "@/types/team-type";
+import type { JoinTeamAsMemberResponse } from "@/types/team-type";
+import type { ApiErrorResponse } from "@/types";
 
 const AUTH_COOKIE_NAME = process.env.AUTH_COOKIE_NAME ?? "token";
 
