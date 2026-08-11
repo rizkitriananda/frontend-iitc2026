@@ -36,7 +36,7 @@ export default function Countdown() {
       <div className="text-center mb-12">
         <h3 className="text-xl sm:text-2xl font-semibold text-slate-900 inline-block relative pb-3">
           Menuju Penutupan Pendaftaran
-          <span className="absolute left-1/2 -translate-x-1/2 bottom-0 w-12 h-[3px] rounded-full bg-blue-700"></span>
+          <span className="absolute left-1/2 -translate-x-1/2 bottom-0 w-12 h-0.75 rounded-full bg-blue-700"></span>
         </h3>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-10 xl:gap-14 w-full">
@@ -58,7 +58,7 @@ export default function Countdown() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className={`flex flex-col items-center justify-center bg-white border border-slate-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] w-full h-28 sm:h-36 lg:h-[11rem] xl:h-[12.5rem] ${borderRadiusClass}`}
+              className={`flex flex-col items-center justify-center bg-white border border-slate-300 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] w-full h-28 sm:h-36 lg:h-44 xl:h-50 ${borderRadiusClass}`}
             >
               <span
                 className="text-4xl sm:text-6xl lg:text-[5.5rem] xl:text-[6.5rem] font-bold text-[#8C4B21] leading-none mb-2 lg:mb-4"

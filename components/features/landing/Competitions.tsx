@@ -1,4 +1,5 @@
 "use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,100 +15,46 @@ import { motion } from "framer-motion";
 import { useCompetitions } from "@/features/competition/hooks/use-competitions";
 import SeminarInfoCard from "@/components/features/dashboard/seminar/SeminarInfoCard";
 
-interface CompetitionItem {
-  name: string;
-  competitionPrice?: number | null;
-  guidebookLink?: string;
-  guideBookLink?: string;
-  guide_book_link?: string;
-  linkPanduan?: string;
-  deadline?: string;
-}
+import type { CompetitionItem } from "@/types";
+import {
+  formatPrice,
+  getGuidebookLink,
+  getFormattedDeadline,
+} from "./competitions.constants";
 
 export default function Competitions() {
   const { data: competitions } = useCompetitions() as {
     data: CompetitionItem[] | undefined;
   };
 
-  function formatPrice(
-    price: number | null | undefined,
-    fallback: string,
-  ): string {
-    if (price === null || price === undefined || price === 0) {
-      return fallback;
-    }
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  }
-
+  // Data kalkulasi harga & informasi lomba
   const webPrice = formatPrice(
     competitions?.find((c) => c.name.toLowerCase().includes("web"))
       ?.competitionPrice,
     "Rp 100.000",
   );
-
   const uiuxPrice = formatPrice(
     competitions?.find((c) => c.name.toLowerCase().includes("ui"))
       ?.competitionPrice,
     "Rp 100.000",
   );
-
   const genAiPrice = formatPrice(
     competitions?.find((c) => c.name.toLowerCase().includes("ai"))
       ?.competitionPrice,
     "Rp 75.000",
   );
 
-  const getGuidebookLink = (nameKeyword: string) => {
-    const comp = competitions?.find((c) =>
-      c.name.toLowerCase().includes(nameKeyword.toLowerCase()),
-    ) as CompetitionItem | undefined;
+  const webGuidebook = getGuidebookLink(competitions, "web");
+  const uiuxGuidebook = getGuidebookLink(competitions, "ui");
+  const genAiGuidebook = getGuidebookLink(competitions, "ai");
 
-    if (!comp) return "#";
-    const link =
-      comp.guidebookLink ||
-      comp.guideBookLink ||
-      comp.guide_book_link ||
-      comp.linkPanduan;
-    return link || "#";
-  };
-
-  const webGuidebook = getGuidebookLink("web");
-  const uiuxGuidebook = getGuidebookLink("ui");
-  const genAiGuidebook = getGuidebookLink("ai");
-
-  const getDeadline = (nameKeyword: string, fallback: string) => {
-    const comp = competitions?.find((c) =>
-      c.name.toLowerCase().includes(nameKeyword.toLowerCase()),
-    ) as CompetitionItem | undefined;
-
-    if (!comp) return fallback;
-    const dl = comp.deadline;
-    if (!dl) return fallback;
-
-    try {
-      const date = new Date(dl);
-      if (isNaN(date.getTime())) return dl;
-      return new Intl.DateTimeFormat("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(date);
-    } catch {
-      return dl;
-    }
-  };
-
-  const webDeadline = getDeadline("web", "22 Agt '26");
-  const uiuxDeadline = getDeadline("ui", "22 Agt '26");
-  const genAiDeadline = getDeadline("ai", "22 Agt 2026");
+  const webDeadline = getFormattedDeadline(competitions, "web", "22 Agt '26");
+  const uiuxDeadline = getFormattedDeadline(competitions, "ui", "22 Agt '26");
+  const genAiDeadline = getFormattedDeadline(competitions, "ai", "22 Agt 2026");
 
   return (
     <section id="kompetisi" className="w-full scroll-mt-24 space-y-6">
-      {/* Header */}
+      {/* Header Section */}
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-4xl font-bold">Kategori Kompetisi</h2>
@@ -151,24 +98,15 @@ export default function Competitions() {
 
             <div className="mt-auto relative z-10 space-y-6">
               <div className="flex flex-wrap gap-2.5">
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  HTML
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  CSS
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  Tailwind
-                </Badge>
+                {["HTML", "CSS", "Tailwind"].map((tech) => (
+                  <Badge
+                    key={tech}
+                    variant="outline"
+                    className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
+                  >
+                    {tech}
+                  </Badge>
+                ))}
               </div>
               <a href={webGuidebook} target="_blank" rel="noopener noreferrer">
                 <Button
@@ -212,18 +150,15 @@ export default function Competitions() {
 
             <div className="mt-auto relative z-10 space-y-6">
               <div className="flex flex-wrap gap-2.5">
-                <Badge
-                  variant="outline"
-                  className="bg-transparent border-white/40 text-white rounded-full font-medium px-5 py-2 text-[0.85rem]"
-                >
-                  Figma
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-transparent border-white/40 text-white rounded-full font-medium px-5 py-2 text-[0.85rem]"
-                >
-                  Prototyping
-                </Badge>
+                {["Figma", "Prototyping"].map((tech) => (
+                  <Badge
+                    key={tech}
+                    variant="outline"
+                    className="bg-transparent border-white/40 text-white rounded-full font-medium px-5 py-2 text-[0.85rem]"
+                  >
+                    {tech}
+                  </Badge>
+                ))}
               </div>
               <a href={uiuxGuidebook} target="_blank" rel="noopener noreferrer">
                 <Button className="bg-white text-[#1100C9] hover:bg-slate-100 rounded-xl px-6 py-6 font-semibold flex items-center gap-2 w-fit">
@@ -255,24 +190,15 @@ export default function Competitions() {
               </div>
 
               <div className="flex flex-wrap gap-2.5 mt-auto">
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  Midjourney
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  Runway
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
-                >
-                  Sora
-                </Badge>
+                {["Midjourney", "Runway", "Sora"].map((tech) => (
+                  <Badge
+                    key={tech}
+                    variant="outline"
+                    className="bg-white border-slate-200 text-slate-700 rounded-full font-medium px-4 py-2 text-[0.85rem]"
+                  >
+                    {tech}
+                  </Badge>
+                ))}
               </div>
             </div>
 

@@ -41,3 +41,13 @@ export interface GetSeminarsResponse {
     seminars: SeminarItem[];
   };
 }
+
+export interface CompetitionItem {
+  name: string;
+  competitionPrice?: number | null;
+  guidebookLink?: string;
+  guideBookLink?: string;
+  guide_book_link?: string;
+  linkPanduan?: string;
+  deadline?: string;
+}

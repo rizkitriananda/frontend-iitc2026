@@ -30,7 +30,7 @@ export default function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-        <div className="max-w-[1440px] mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="max-w-360 mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Bagian Logo (Kiri) */}
           <Link href="/" className="flex items-center" onClick={closeMenu}>
             <Image
@@ -69,7 +69,7 @@ export default function Navbar() {
             aria-label={isOpen ? "Tutup menu" : "Buka menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-menu"
-            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#2F2FE4]"
+            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-700 hover:bg-slate-100 focus-visible:outline  focus-visible:outline-[#2F2FE4]"
           >
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>

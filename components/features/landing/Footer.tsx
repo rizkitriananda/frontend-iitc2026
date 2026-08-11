@@ -26,19 +26,22 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 const socialIcons = [
   { icon: Mail, href: "#", label: "Email" },
   { icon: Globe, href: "https://www.intermediaamikom.org/", label: "Website" },
-  { icon: InstagramIcon, href: "https://www.instagram.com/intermedia_amikompwt/", label: "Instagram" },
-  { icon: MessageSquare, href: "#", label: "Forum" }
+  {
+    icon: InstagramIcon,
+    href: "https://www.instagram.com/intermedia_amikompwt/",
+    label: "Instagram",
+  },
+  { icon: MessageSquare, href: "#", label: "Forum" },
 ];
 
 export default function Footer() {
   return (
     <footer className="w-full bg-[#030310] border-t border-indigo-500/10 text-slate-300 py-12 relative overflow-hidden">
       {/* Efek Glow Latar Belakang */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[200px] bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-50 bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none" />
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
-          
           {/* Kiri: Logo, Judul & Sosial */}
           <div className="flex flex-col items-center lg:items-start gap-5">
             <div className="flex gap-4">
@@ -63,10 +66,10 @@ export default function Footer() {
             </div>
 
             <div className="text-center lg:text-left">
-              <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">
+              <h2 className="text-xl font-bold text-transparent bg-clip-text bg-linear-to-r from-white to-indigo-200">
                 IITC 2026
               </h2>
-              <p className="text-slate-400 text-xs mt-1 max-w-[250px]">
+              <p className="text-slate-400 text-xs mt-1 max-w-62.5">
                 &quot;From Vision to Innovation&quot;
               </p>
             </div>
@@ -87,8 +90,19 @@ export default function Footer() {
 
           {/* Tengah: Navigasi (Grid 3 Kolom) */}
           <nav className="grid grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 text-sm font-medium text-slate-400">
-            {['Beranda', 'Kategori Lomba', 'Panduan', 'Syarat & Ketentuan', 'Kebijakan Privasi', 'Kontak Kami'].map((item) => (
-              <Link key={item} href="#" className="hover:text-indigo-300 transition-colors text-center lg:text-left">
+            {[
+              "Beranda",
+              "Kategori Lomba",
+              "Panduan",
+              "Syarat & Ketentuan",
+              "Kebijakan Privasi",
+              "Kontak Kami",
+            ].map((item) => (
+              <Link
+                key={item}
+                href="#"
+                className="hover:text-indigo-300 transition-colors text-center lg:text-left"
+              >
                 {item}
               </Link>
             ))}
@@ -97,7 +111,9 @@ export default function Footer() {
           {/* Kanan: Copyright */}
           <div className="text-sm text-slate-500 text-center lg:text-right flex flex-col gap-1">
             <p>&copy; {new Date().getFullYear()} IITC 2026.</p>
-            <p className="text-indigo-300/70 font-medium">Built for Innovation.</p>
+            <p className="text-indigo-300/70 font-medium">
+              Built for Innovation.
+            </p>
           </div>
         </div>
       </div>
