@@ -1,4 +1,3 @@
-// app/(dashboard)/dashboard/submission/page.tsx
 "use client";
 
 import { useState } from "react";

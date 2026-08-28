@@ -43,7 +43,7 @@ export function getWhatsAppGroupUrl(competitionName?: string): string {
 export function computeSubmissionTimeStatus(): "before" | "after" | "active" {
   const now = new Date();
   const startDate = new Date("2026-08-19T00:00:00+07:00");
-  const endDate = new Date("2026-08-27T23:59:59+07:00");
+  const endDate = new Date("2026-08-30T23:59:59+07:00");
 
   if (now < startDate) return "before";
   if (now > endDate) return "after";
