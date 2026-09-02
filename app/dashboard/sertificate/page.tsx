@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function CertificatePage() {
   // Menghindari cascading render dengan mengevaluasi waktu target langsung pada inisialisasi state
   const [isLockedModalOpen, setIsLockedModalOpen] = useState(() => {
-    const targetTime = new Date("2026-09-12T13:00:00+07:00").getTime();
+    const targetTime = new Date("2026-09-1T13:00:00+07:00").getTime();
     const currentTime = new Date().getTime();
     return currentTime < targetTime;
   });
