@@ -30,6 +30,7 @@ const menuItems = [
   { icon: Wallet, label: "Pembayaran", href: "/dashboard/payment" },
   { icon: CloudUpload, label: "Unggah Karya", href: "/dashboard/submission" },
   { icon: GraduationCap, label: "Seminar", href: "/dashboard/seminar" },
+  { icon: GraduationCap, label: "Sertifikat", href: "/dashboard/sertificate" },
 ];
 
 interface NavLinkProps {

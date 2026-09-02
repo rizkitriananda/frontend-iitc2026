@@ -12,10 +12,9 @@ interface CertificateLockedModalProps {
 
 export default function CertificateLockedModal({
   isOpen,
-  onClose,
 }: CertificateLockedModalProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen}>
       <DialogContent
         onInteractOutside={(e) => e.preventDefault()}
         className="sm:max-w-120 p-8 rounded-3xl border-none shadow-2xl bg-white flex flex-col items-center text-center"
@@ -42,17 +41,10 @@ export default function CertificateLockedModal({
         <div className="flex flex-col w-full gap-3">
           <Button
             asChild
-            className="w-full bg-[#1a0b8c] hover:bg-[#13076b] text-white font-medium h-12 rounded-xl shadow-sm transition-all"
+            className="w-full bg-[#2F2FE4] hover:bg-[#13076b] text-white font-medium h-12 rounded-xl shadow-sm transition-all"
           >
             <Link href="/dashboard">Kembali ke Dashboard</Link>
           </Button>
-
-          <button
-            onClick={onClose}
-            className="text-slate-500 hover:text-slate-700 text-sm font-medium py-2 transition-colors"
-          >
-            Tutup
-          </button>
         </div>
       </DialogContent>
     </Dialog>

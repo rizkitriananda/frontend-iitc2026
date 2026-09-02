@@ -1,4 +1,3 @@
-// components/features/dashboard/submission/SubmissionPeriodModal.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -25,7 +24,7 @@ export default function SubmissionPeriodModal({
     : "Pengumpulan Telah Ditutup";
   const message = isBefore
     ? "Jadwal unggah karya baru akan dimulai pada tanggal 19 Agustus 2026. Silakan persiapkan karya terbaik tim Anda dan kembali lagi nanti."
-    : "Batas waktu unggah karya telah berakhir pada 27 Agustus 2026. Anda sudah tidak dapat mengunggah atau mengubah tautan karya.";
+    : "Batas waktu unggah karya telah berakhir pada 30 Agustus 2026. Anda sudah tidak dapat mengunggah atau mengubah tautan karya.";
 
   return (
     <Dialog open={isOpen}>
