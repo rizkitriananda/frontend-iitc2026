@@ -4,6 +4,7 @@ export interface CertificateData {
   teamId: number;
   teamName: string;
   competitionName: string;
+  paymentStatus: string;
   certificateNumber: string;
   winnerStatus: string;
   seminarName?: string;

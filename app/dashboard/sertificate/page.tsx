@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Award } from "lucide-react";
+import { Award, ShieldAlert } from "lucide-react";
 import CertificateCard from "@/components/features/dashboard/certificate/CertificateCard";
 import SeminarCertificateCard from "@/components/features/dashboard/certificate/SeminarCertificateCard";
 import CertificateLockedModal from "@/components/features/dashboard/certificate/CertificateLockedModal";
@@ -21,9 +21,19 @@ export default function CertificatePage() {
   const { data: certResponse, isLoading } = useMyCertificate();
 
   const certData = certResponse?.data;
+
+  // Ambil dan bersihkan status juara
   const status = certData?.winnerStatus
     ? String(certData.winnerStatus).trim()
     : "";
+
+  // Ambil dan bersihkan status pembayaran
+  const paymentStatus = certData?.paymentStatus
+    ? String(certData.paymentStatus).toUpperCase().trim()
+    : "";
+
+  // Sertifikat hanya bisa diakses jika pembayaran berstatus VALID
+  const isPaymentValid = paymentStatus === "VALID";
 
   const isWinner =
     status === "1" ||
@@ -65,8 +75,8 @@ export default function CertificatePage() {
           </div>
         </div>
 
-        {/* TAB SWITCHER (Hanya muncul jika user adalah Pemenang/Juara) */}
-        {!isLoading && isWinner && (
+        {/* TAB SWITCHER (Hanya muncul jika Pembayaran VALID dan user adalah Pemenang) */}
+        {!isLoading && isPaymentValid && isWinner && (
           <div className="flex justify-center">
             <div className="bg-slate-100/90 p-1.5 rounded-full flex items-center shadow-sm border border-slate-200/80">
               <button
@@ -93,10 +103,25 @@ export default function CertificatePage() {
           </div>
         )}
 
-        {/* KONTEN KARTU BERDASARKAN STATUS DAN TAB AKTIF */}
+        {/* KONTEN KARTU BERDASARKAN STATUS PEMBAYARAN DAN TAB AKTIF */}
         {isLoading ? (
           <div className="w-full flex items-center justify-center py-12">
             <Skeleton className="w-full max-w-4xl h-112.5 rounded-3xl" />
+          </div>
+        ) : !isPaymentValid ? (
+          /* Tampilan Pengganti Jika Pembayaran Tidak Valid */
+          <div className="w-full max-w-3xl mx-auto mt-8 flex flex-col items-center justify-center bg-amber-50 border border-amber-200 rounded-3xl p-10 text-center shadow-sm">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-amber-900 mb-2">
+              Sertifikat Tidak Tersedia
+            </h2>
+            <p className="text-amber-700/80 text-sm max-w-md">
+              Sertifikat hanya dapat diunduh oleh peserta yang telah
+              menyelesaikan tahap pendaftaran dan memiliki status pembayaran
+              yang telah diverifikasi (VALID).
+            </p>
           </div>
         ) : isWinner && activeTab === "seminar" ? (
           <SeminarCertificateCard />
